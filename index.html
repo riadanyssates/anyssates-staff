@@ -72,6 +72,8 @@ select.unset{border-color:var(--crit-ink);color:var(--crit-ink)}
 textarea{width:100%;box-sizing:border-box;border:1px solid var(--line);border-radius:12px;background:var(--field);padding:10px 12px;font-size:14px;resize:vertical}
 .grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
 .grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.grid4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
+.grid4 .stat{padding:10px 8px}.grid4 .stat .v{font-size:22px}.grid4 .small{font-size:12px}
 .tile{min-height:116px;box-sizing:border-box;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:14px;display:flex;flex-direction:column;justify-content:space-between;text-align:left;cursor:pointer;color:var(--fg)}
 .tile .t{font-size:16px}
 .tile .sub{font-size:13px;color:var(--muted);margin-top:2px}
@@ -393,16 +395,16 @@ function roomsFor(off){
  });
 }
 V.menage=function(){
- var off=S.mday||0;var f=S.mfilter||null;var rs=roomsFor(off);var today=off===0;
+ var off=S.mday||0;var f=S.mfilter||null;var fa=f||'tout';var rs=roomsFor(off);var today=off===0;
  var dayTabs='<div class="grid3" role="group" aria-label="Jour" style="gap:6px">'+[[0,'Aujourd\'hui'],[1,'Demain']].map(function(d){var on=off===d[0];return '<button type="button" class="day'+(on?' on':'')+'" style="height:44px" aria-pressed="'+on+'" data-mday="'+d[0]+'">'+d[1]+'</button>';}).join('')+'<label class="day'+(off>1||off<0?' on':'')+'" style="height:44px;display:flex;align-items:center;justify-content:center;position:relative;cursor:pointer">'+(off>1||off<0?esc(dayLabel(ymd(off)).split(' ').slice(1).join(' ')):'Autre date')+'<input type="date" data-mdate="1" value="'+ymd(off)+'" aria-label="Choisir une date" style="position:absolute;inset:0;opacity:0;cursor:pointer"></label></div>';
  var head=back()+'<div><h1 class="display">'+(today?'Ménage du jour':off===1?'Ménage de demain':'Ménage')+'</h1><div class="small muted" style="margin-top:4px">'+dayLabel(ymd(off))+'</div></div>'+dayTabs;
  if(!rs)return head+'<div class="card item muted" style="padding:16px">Pas de réservations pour cette date dans la démo. En réel, elles viendront d\'Octorate.</div>';
- function cnt(st){return rs.filter(function(r){return r.status===st;}).length;}
- function tile(st,label,style,cls){var on=f===st;return '<button type="button" class="stat stbtn'+(cls?' '+cls:'')+(on?' on':'')+'" style="'+style+'" data-mfilter="'+st+'" aria-pressed="'+on+'"><div class="v">'+cnt(st)+'</div><div class="small">'+label+'</div></button>';}
+ function cnt(st){return st==='tout'?rs.length:rs.filter(function(r){return r.status===st;}).length;}
+ function tile(st,label,style,cls){var on=fa===st;return '<button type="button" class="stat stbtn'+(cls?' '+cls:'')+(on?' on':'')+'" style="'+style+'" data-mfilter="'+st+'" aria-pressed="'+on+'"><div class="v">'+cnt(st)+'</div><div class="small">'+label+'</div></button>';}
  var occ=rs.filter(function(r){return r.status!=='libre';});
- var shown=f?rs.filter(function(r){return r.status===f;}):(today?occ:rs.filter(function(r){return r.status!=='libre'||r.note;}));
+ var shown=f?rs.filter(function(r){return r.status===f;}):rs;
  var order=shown.slice().sort(function(a,b){var o={depart:0,recouche:1,libre:2};return o[a.status]-o[b.status];});
- var title=f==='depart'?'Départs':f==='recouche'?'Recouches':f==='libre'?'Chambres libres':today?'À répartir':'Prévu';
+ var title=f==='depart'?'Départs':f==='recouche'?'Recouches':f==='libre'?'Chambres libres':'Toutes les chambres';
  function rowOf(r){
   if(r.status==='libre')return '<div class="item"><div class="grow"><button class="back" style="min-height:0;color:var(--fg);font-weight:600" data-go="fiche" data-p="'+r.id+'">'+esc(r.name)+'</button><div class="xs" style="font-weight:600;color:'+(r.note?'var(--warn-ink)':'var(--muted)')+'">'+(r.note?esc(r.note):'Libre'+(r.type?' · '+esc(r.type):''))+'</div></div><span class="pill p-neutral">Libre</span></div>';
   var lab='<div class="xs" style="font-weight:600;color:'+(r.status==='depart'?'var(--crit-ink)':'var(--accent-ink)')+'">'+(r.status==='depart'?'Départ':'Recouche')+'</div>';
@@ -410,11 +412,11 @@ V.menage=function(){
   return '<div class="item"><div class="grow"><button class="back" style="min-height:0;color:var(--fg);font-weight:600" data-go="fiche" data-p="'+r.id+'">'+esc(r.name)+'</button>'+lab+'</div><label class="sr" for="w-'+r.id+'">Femme de chambre pour '+esc(r.name)+'</label><select id="w-'+r.id+'" data-assign="'+r.id+'"'+(r.who?'':' class="unset"')+'>'+opts(FEMMES,r.who,'Non attribuée')+'</select>'+mPill(r)+'</div>';
  }
  return head+
- '<div class="grid3">'+tile('depart','Départs','background:var(--crit-soft);color:var(--crit-ink)')+tile('recouche','Recouches','background:var(--accent-soft);color:var(--accent-ink)')+tile('libre','Libres','','card')+'</div>'+
+ '<div class="grid4">'+tile('tout','Toutes','','card')+tile('depart','Départs','background:var(--crit-soft);color:var(--crit-ink)')+tile('recouche','Recouches','background:var(--accent-soft);color:var(--accent-ink)')+tile('libre','Libres','','card')+'</div>'+
  (today?'<button class="btn primary block" data-go="planning">Préparer le planning de demain</button>'+
  '<div class="grid2"><button class="btn ghost" data-go="blanchisserie">Blanchisserie</button><button class="btn ghost" data-go="taches">Tâches récurrentes</button></div>'+
  (S.issues.length?'<div class="stack"><h2 class="sec">Signalements <span class="n">· '+S.issues.length+'</span></h2>'+S.issues.map(function(i){return '<div class="alert crit">'+ic('warn','currentColor')+'<div class="grow small"><b>'+esc(i.room)+'</b> · '+esc(i.by)+' : '+esc(i.txt)+'</div></div>';}).join('')+'</div>':''):'<button class="btn primary block" data-go="planning">Attribuer dans le planning de demain</button>')+
- '<div class="stack"><div class="between"><h2 class="sec">'+title+(f?' <span class="n">· '+shown.length+'</span>':'')+'</h2>'+(f?'<button class="back" style="min-height:0;font-size:13px" data-mfilter="'+f+'">Tout afficher</button>':today?'<span class="small muted">Prêtes : '+occ.filter(function(r){return r.m==='prete';}).length+' / '+occ.length+'</span>':'')+'</div><div class="card list">'+(order.length?order.map(rowOf).join(''):'<div class="item muted">Aucune chambre</div>')+'</div></div>';
+ '<div class="stack"><div class="between"><h2 class="sec">'+title+(f?' <span class="n">· '+shown.length+'</span>':'')+'</h2>'+(f?'':today?'<span class="small muted">Prêtes : '+occ.filter(function(r){return r.m==='prete';}).length+' / '+occ.length+'</span>':'')+'</div><div class="card list">'+(order.length?order.map(rowOf).join(''):'<div class="item muted">Aucune chambre</div>')+'</div></div>';
 };
 V.planning=function(){
  if(!S.plan)buildPlan();
@@ -651,7 +653,7 @@ function render(){
 app.addEventListener('click',function(e){
  var el=e.target.closest('[data-role],[data-go],[data-act],[data-bdset],[data-bdint],[data-tab],[data-day],[data-step],[data-sig],[data-done],[data-spa],[data-buy],[data-nuit],[data-mfilter],[data-mday]');if(!el)return;
  if(el.dataset.mday){S.mday=+el.dataset.mday;S.mfilter=null;render();return;}
- if(el.dataset.mfilter){S.mfilter=S.mfilter===el.dataset.mfilter?null:el.dataset.mfilter;render();return;}
+ if(el.dataset.mfilter){var mv=el.dataset.mfilter;S.mfilter=(mv==='tout'||S.mfilter===mv)?null:mv;render();return;}
  if(el.dataset.nuit){var nq=el.dataset.nuit.split('|');var cur0=S.nuit[nq[0]];if(cur0&&cur0.v===nq[1])delete S.nuit[nq[0]];else S.nuit[nq[0]]={v:nq[1],t:now()};render();return;}
  if(el.dataset.role){S.role=el.dataset.role;S.view='home';try{localStorage.setItem('anyssates-role',S.role);}catch(x){}render();window.scrollTo(0,0);return;}
  if(el.dataset.tab){LIVE.tab=el.dataset.tab;render();return;}
