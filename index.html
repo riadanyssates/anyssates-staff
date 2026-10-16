@@ -1,0 +1,691 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#2E5A4C">
+<title>Anyssates Staff</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=DM+Sans:wght@400;500;600&display=swap">
+<style>
+:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+body{margin:0}img{max-width:100%}[hidden]{display:none!important}
+:root{
+  --bg:#F5F2EC;--surface:#FFFFFF;--line:#E4DED3;--line2:#EEE9E0;--field:#FAF8F4;--chip:#EEE9E0;
+  --fg:#1F2421;--muted:#5E625D;--chip-ink:#4A4D49;
+  --accent:#2E5A4C;--accent-fg:#FFFFFF;--accent-soft:#E3ECE7;--accent-ink:#1F4036;
+  --warn-soft:#F4E9D8;--warn-ink:#6E4815;--crit-soft:#F5E3DC;--crit-ink:#8A3624;--info-soft:#E2EBF1;--info-ink:#234A66;
+  --display:'Cormorant Garamond',Georgia,'Times New Roman',serif;
+  --body:'DM Sans',system-ui,-apple-system,'Segoe UI',sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#141816;--surface:#1C211E;--line:#2E3531;--line2:#262C29;--field:#222824;--chip:#2A302C;
+  --fg:#ECEAE4;--muted:#A3A79F;--chip-ink:#C9CCC4;
+  --accent:#7FB8A3;--accent-fg:#10241C;--accent-soft:#22362E;--accent-ink:#A9D6C4;
+  --warn-soft:#3A2E1B;--warn-ink:#E5C48F;--crit-soft:#3D2420;--crit-ink:#F0A894;--info-soft:#1E2D38;--info-ink:#9FC3DC;
+  color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#141816;--surface:#1C211E;--line:#2E3531;--line2:#262C29;--field:#222824;--chip:#2A302C;
+  --fg:#ECEAE4;--muted:#A3A79F;--chip-ink:#C9CCC4;
+  --accent:#7FB8A3;--accent-fg:#10241C;--accent-soft:#22362E;--accent-ink:#A9D6C4;
+  --warn-soft:#3A2E1B;--warn-ink:#E5C48F;--crit-soft:#3D2420;--crit-ink:#F0A894;--info-soft:#1E2D38;--info-ink:#9FC3DC;
+  color-scheme:dark}
+html,body{background:var(--bg);color:var(--fg)}
+body{font-family:var(--body);font-size:15px;line-height:1.4;padding-inline:16px}
+#app{max-width:460px;margin:0 auto;padding-block:16px 40px;display:flex;flex-direction:column;gap:18px}
+h1,h2,h3{margin:0;text-wrap:balance}
+.display{font-family:var(--display);font-weight:600}
+h1.display{font-size:36px;line-height:1.05}
+h2.sec{font-size:15px;font-weight:600}
+h2.sec .n{color:var(--muted);font-weight:500}
+.muted{color:var(--muted)}
+.small{font-size:13px}.xs{font-size:12px}
+.row{display:flex;align-items:center;gap:10px}
+.between{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.stack{display:flex;flex-direction:column;gap:8px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px}
+.list>*{border-bottom:1px solid var(--line2)}.list>*:last-child{border-bottom:0}
+.item{padding:12px 14px;display:flex;align-items:center;gap:12px;min-height:44px;box-sizing:border-box}
+.item .grow{flex:1;min-width:0}
+.t{font-weight:600}
+.time{width:46px;flex-shrink:0;font-weight:600;font-variant-numeric:tabular-nums;color:var(--accent-ink)}
+.pill{display:inline-block;font-size:12px;font-weight:600;padding:4px 9px;border-radius:999px;white-space:nowrap}
+.p-ok{background:var(--accent-soft);color:var(--accent-ink)}
+.p-warn{background:var(--warn-soft);color:var(--warn-ink)}
+.p-crit{background:var(--crit-soft);color:var(--crit-ink)}
+.p-info{background:var(--info-soft);color:var(--info-ink)}
+.p-neutral{background:var(--chip);color:var(--chip-ink)}
+.alert{border-radius:12px;padding:12px 14px;display:flex;gap:12px;align-items:center}
+.alert.crit{background:var(--crit-soft);color:var(--crit-ink)}
+.alert.warn{background:var(--warn-soft);color:var(--warn-ink)}
+.alert .grow{flex:1;min-width:0}
+button,select,input,textarea{font:inherit;color:inherit}
+.btn{min-height:44px;padding:0 16px;border-radius:12px;border:1px solid var(--accent);background:var(--surface);color:var(--accent);font-weight:600;cursor:pointer}
+.btn.primary{background:var(--accent);color:var(--accent-fg);border-color:var(--accent)}
+.btn.block{width:100%;min-height:50px}
+.btn.ghost{border-color:var(--line);background:var(--field);color:var(--fg)}
+.btn:disabled{opacity:.5;cursor:default}
+button:focus-visible,select:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,label:focus-within{outline:2px solid var(--accent);outline-offset:2px}
+select{height:44px;border:1px solid var(--line);border-radius:10px;background:var(--field);padding:0 8px;font-size:14px;max-width:150px}
+select.unset{border-color:var(--crit-ink);color:var(--crit-ink)}
+textarea{width:100%;box-sizing:border-box;border:1px solid var(--line);border-radius:12px;background:var(--field);padding:10px 12px;font-size:14px;resize:vertical}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.tile{min-height:116px;box-sizing:border-box;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:14px;display:flex;flex-direction:column;justify-content:space-between;text-align:left;cursor:pointer;color:var(--fg)}
+.tile .t{font-size:16px}
+.tile .sub{font-size:13px;color:var(--muted);margin-top:2px}
+.tile .sub.crit{color:var(--crit-ink)}
+.ico{width:24px;height:24px;stroke:var(--accent);fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.stat{border-radius:12px;padding:12px}
+.stbtn{display:block;width:100%;text-align:left;font:inherit;cursor:pointer;border:1.5px solid transparent;transition:border-color .15s,box-shadow .15s}
+.stbtn.card{border:1px solid var(--line,#e6e1d8)}
+.stbtn.on{border-color:currentColor;box-shadow:0 0 0 2px currentColor inset}
+.stbtn:focus-visible{outline:2px solid currentColor;outline-offset:2px}
+.stat .v{font-size:26px;font-weight:600;font-variant-numeric:tabular-nums}
+.top{display:flex;justify-content:space-between;align-items:center;min-height:44px}
+.back{background:none;border:0;color:var(--accent);font-size:15px;display:flex;align-items:center;gap:4px;min-height:44px;padding:0;cursor:pointer}
+.brand{font-family:var(--display);font-weight:600;font-size:18px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent)}
+.demo{font-size:12px;background:var(--warn-soft);color:var(--warn-ink);border-radius:10px;padding:8px 12px}
+.label{font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.07em}
+.hero{background:var(--accent);color:var(--accent-fg);border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:10px}
+.hero .label{color:var(--accent-fg);opacity:.85}
+.bar{height:6px;border-radius:999px;background:var(--line2);overflow:hidden}
+.bar>i{display:block;height:100%;background:var(--accent)}
+.bar>i.low{background:var(--crit-ink)}
+.days{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px}
+.day{height:36px;border-radius:8px;border:0;background:var(--chip);color:var(--chip-ink);font-size:13px;cursor:pointer}
+.day.on{background:var(--accent);color:var(--accent-fg);font-weight:600}
+.step{display:flex;align-items:center;gap:4px}
+.step button{width:44px;height:44px;border-radius:10px;border:1px solid var(--line);background:var(--field);font-size:18px;cursor:pointer}
+.step b{width:32px;text-align:center;font-variant-numeric:tabular-nums}
+.check{display:flex;align-items:center;gap:12px;padding:12px 14px;min-height:44px;box-sizing:border-box;cursor:pointer}
+.check input{width:22px;height:22px;accent-color:var(--accent);margin:0}
+.check.done .grow{text-decoration:line-through;color:var(--muted)}
+.photo{border-radius:12px;padding:12px;min-height:104px;box-sizing:border-box;display:flex;flex-direction:column;justify-content:space-between;gap:6px;position:relative;overflow:hidden;cursor:pointer}
+.photo.todo{background:var(--accent);color:var(--accent-fg)}
+.photo.done{background:var(--accent-soft);color:var(--accent-ink)}
+.photo input{position:absolute;inset:0;opacity:0;cursor:pointer}
+.photo img{width:44px;height:44px;object-fit:cover;border-radius:8px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{min-height:44px;padding:0 14px;border-radius:999px;border:1px solid var(--line);background:var(--field);font-size:14px;cursor:pointer}
+.chip.on{background:var(--crit-soft);border-color:var(--crit-ink);color:var(--crit-ink)}
+.tbl{display:grid;grid-template-columns:minmax(0,2.2fr) repeat(3,minmax(0,1fr));gap:8px;padding:10px 14px;font-size:14px;font-variant-numeric:tabular-nums}
+.tbl>*:not(:first-child){text-align:right}
+.tbl.head{font-size:12px;font-weight:600;color:var(--muted)}
+.tbl.bad{background:var(--crit-soft)}
+.tbl .neg{color:var(--crit-ink);font-weight:600}
+.tbl .ok{color:var(--accent-ink)}
+.roles{display:flex;flex-direction:column;gap:10px}
+.role{display:flex;align-items:center;gap:14px;text-align:left;padding:14px 16px;min-height:64px;background:var(--surface);border:1px solid var(--line);border-radius:14px;cursor:pointer;color:var(--fg)}
+.role .grow{flex:1}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--fg);color:var(--bg);padding:12px 18px;border-radius:12px;font-size:14px;font-weight:500;max-width:calc(100% - 48px);z-index:10}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.sw{width:8px;height:8px;border-radius:999px;flex-shrink:0}
+@page{margin:14mm}
+@media print{
+  :root,:root[data-theme="dark"]{--bg:#fff;--surface:#fff;--line:#ccc;--line2:#ddd;--fg:#000;--muted:#444;--chip:#eee;--chip-ink:#222;--accent:#2E5A4C;--accent-fg:#fff;--accent-soft:#E3ECE7;--accent-ink:#1F4036;--warn-soft:#F4E9D8;--warn-ink:#6E4815;--crit-soft:#F5E3DC;--crit-ink:#8A3624;--info-soft:#E2EBF1;--info-ink:#234A66}
+  body{padding:0;font-size:12px}#app{max-width:none;padding:0;gap:10px}.noprint,.toast{display:none!important}
+  .card,.item{break-inside:avoid}.item{min-height:0;padding:6px 10px}h1.display{font-size:26px}.view{animation:none!important}
+  *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+}
+@media (prefers-reduced-motion:no-preference){.view{animation:in .18s ease-out}@keyframes in{from{opacity:.4;transform:translateY(4px)}to{opacity:1;transform:none}}}
+</style>
+</head>
+<body>
+
+<div id="app" aria-live="polite"></div>
+<div id="toast" class="toast" role="status" hidden></div>
+
+<script>
+(function(){
+var DAYS=['','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi','Dimanche'];
+var D1=['','L','M','M','J','V','S','D'];
+var TODAY=3, TOMORROW=4; // mercredi 2 / jeudi 3 décembre (démo)
+var TEAM=[
+ {n:'Valérie',p:'Propriétaire et gérante'},
+ {n:'Nicolas',p:'Gérant sur place'},
+ {n:'Maxence',p:'Stagiaire manager'},
+ {n:'Tarik',p:'Cuisine et réception de jour'},
+ {n:'Fahida',p:'Gouvernante',menage:true},
+ {n:'Leila',p:'Binôme de Fahida, deuxième partie de journée',menage:true,femme:true},
+ {n:'Fatim Zara',p:'Femme de chambre',menage:true,femme:true},
+ {n:'Moshnine',p:'Réceptionniste de nuit',menage:true}
+];
+var STAFF=TEAM.filter(function(t){return t.menage;}).map(function(t){return t.n;});
+var FEMMES=TEAM.filter(function(t){return t.femme;}).map(function(t){return t.n;});
+var ROLES=[
+ {id:'direction',label:'Direction',who:'Valérie',desc:'Tout voir, contrôler les achats'},
+ {id:'gerant',label:'Gérant sur place',who:'Nicolas',desc:'Tout voir, contrôler'},
+ {id:'reception',label:'Réception',who:'Maxence',desc:'Tout voir · Maxence, Tarik en journée'},
+ {id:'gouvernante',label:'Gouvernante',who:'Fahida',desc:'Ménage, planning, blanchisserie'},
+ {id:'femme',label:'Femme de chambre',who:'Fatim Zara',desc:'Mes chambres et mes tâches'},
+ {id:'cuisine',label:'Cuisine',who:'Tarik',desc:'Petit-déjeuner, courses et stock'},
+ {id:'spa',label:'Spa',who:'Spa',desc:'Planning des soins et alertes'},
+ {id:'nuit',label:'Réception de nuit',who:'Moshnine',desc:'Check-list de la nuit'}
+];
+var ALL=['equipe','nuit','demain','bdform','chambres','menage','planning','taches','blanchisserie','mestaches','spa','petitdej','cuisine','achats'];
+var NOEQ=ALL.filter(function(v){return v!=='equipe';});
+var ACCESS={direction:ALL,gerant:ALL,reception:NOEQ,gouvernante:NOEQ,femme:['mestaches'],cuisine:['demain','petitdej','cuisine','bdform'],spa:['spa'],nuit:['nuit','demain','chambres']};
+var NUIT=[
+ {h:'18:00',t:'Arrivée',items:[['tenue','Se mettre en tenue du jour comme sur la feuille'],['table','Dresser la table du dîner devant la piscine'],['nbdiners','Savoir combien il y a de dîners','diners'],['bougies','Allumer les bougies, la piscine et la cheminée si nécessaire'],['mep','Faire les mises en place des dîners']]},
+ {h:'19:00 – 22:00',t:'Bar et dîners',items:[['degivre','Dégivrer les congélateurs si nécessaire'],['cocktails','Proposer des cocktails et faire le service du dîner'],['serviettes','Serviettes chaudes, proposer thé, café ou digestif'],['bar','Bien noter les consommations dans le cahier de bar'],['jacuzzi','Fermer le jacuzzi']]},
+ {h:'22:00 – 23:00',t:'Ranger la terrasse',items:[['t-cendriers','Vider les cendriers'],['t-linge','Ramasser le linge'],['t-tables','Débarrasser les tables'],['machines','Vérifier les machines, étendre le linge si nécessaire']]},
+ {h:'',t:'Ranger le patio',items:[['p-table','Ramasser la table devant la piscine'],['p-cendriers','Vider les cendriers'],['p-bougies','Ramasser les bougies'],['eteindre1','Commencer à éteindre']]},
+ {h:'Minuit',t:'Administratif',items:[['police','Fiches de police (0 s\'il n\'y en a pas)','police'],['wa-azdine','Message WhatsApp à Azdine'],['cahier-police','Cahier de police'],['consos','Rentrer les consos dans Octorate'],['caisse','Rapprochement de caisse'],['encaissements','Rentrer les encaissements'],['wa-clients','Surveiller les messages WhatsApp et répondre aux clients présents'],['factures','Envoyer les factures aux clients présents si nécessaire'],['charge','Charger la tablette, l\'iPhone et le TPE'],['dernier','Rester au bureau jusqu\'à l\'arrivée du dernier client'],['sondage','Envoyer le sondage dîner'],['lettre','Sortir la lettre d\'accueil des clients'],['cloture','Message de clôture WhatsApp dès que tous les clients sont rentrés','heure']]},
+ {h:'',t:'Fin de soirée',items:[['lumieres','Éteindre les lumières sauf 3 : bar du bas, petit patio vers l\'éléphant, lampe paille sous les arcades et Anyssates']]},
+ {h:'',t:'Cuisine',items:[['c-ranger','Ranger tout ce qui traîne en cuisine'],['viennoiseries','Sortir les viennoiseries et les mettre dans le four','viennoiseries'],['pain','Sortir le pain Moncho\'s'],['lave','Vider le lave-vaisselle'],['poubelles','Sortir les poubelles']]},
+ {h:'',t:'Repos · Bhou, terrasse, bureau',items:[]},
+ {h:'Lever du soleil',t:'Petit-déjeuner et terrasse',items:[['bghrir','Acheter le bghrir ou les msemen'],['croissants','Faire cuire les croissants'],['jus','Presser le jus d\'orange et aider les filles'],['tables','Mise en place des tables'],['liaison','Dernières infos clients dans le cahier de liaison']]},
+ {h:'8:00',t:'Relève et sortie',items:[['releve','Relève faite','heure']]}
+];
+
+var S={
+ role:null,
+ rooms:[
+  {id:'E1',name:'Ariane',type:'Élégance',status:'recouche',guest:'M. et Mme Durand',pays:'France',pax:2,arr:'Lun. 30 nov.',dep:'Sam. 5 déc.',notes:'',who:'Leila',m:'afaire'},
+  {id:'E2',name:'Bambou',type:'Élégance',status:'depart',guest:'M. Weber',pays:'Allemagne',pax:2,arr:'Dim. 29 nov.',dep:'Mer. 2 déc. · 11:00',notes:'Nouveaux clients à 15:00 (M. et Mme Haddad)',who:'Fatim Zara',m:'prete',mt:'10:31'},
+  {id:'E3',name:'Cannelle',type:'Élégance',status:'recouche',guest:'Mme Schmidt',pays:'Suisse',pax:1,arr:'Mar. 1er déc.',dep:'Jeu. 3 déc. · 11:00',notes:'Végétarienne',who:'Fatim Zara',m:'afaire'},
+  {id:'E4',name:'Blanche',type:'Élégance',status:'libre',who:null},
+  {id:'S1',name:'Joséphine',type:'Signature',status:'depart',guest:'M. et Mme Rossi',pays:'Italie',pax:2,arr:'Ven. 27 nov.',dep:'Mer. 2 déc. · 11:00',notes:'Arrivée suivante à 15:00 : lits jumelés en 180',who:'Fatim Zara',m:'encours',pin:'10:42'},
+  {id:'S2',name:'Anyssates',type:'Signature',status:'recouche',guest:'M. et Mme Laurent',pays:'France',pax:2,arr:'Lun. 30 nov.',dep:'Ven. 4 déc.',notes:'Anniversaire de mariage le 2/12 : pétales et carte en chambre pendant le dîner.',who:'Leila',m:'afaire'},
+  {id:'S3',name:'Agafay',type:'Signature',status:'libre',who:null},
+  {id:'T1',name:'Victoire',type:'Signature Triple',status:'recouche',guest:'Famille Martin',pays:'France',pax:3,arr:'Mar. 1er déc.',dep:'Dim. 6 déc.',notes:'Un enfant de 8 ans',who:null,m:'afaire'},
+  {id:'T2',name:'Sarah',type:'Signature Triple',status:'depart',guest:'M. Okafor',pays:'Royaume-Uni',pax:3,arr:'Sam. 28 nov.',dep:'Mer. 2 déc. · 11:00',notes:'',who:'Leila',m:'afaire'}
+ ],
+ issues:[{room:'Bambou',by:'Fatim Zara',txt:'Ampoule'}],
+ common:[
+  {id:'c1',name:'Ouverture des jacuzzis',detail:'Bâches, allumage, température',time:'8:00',cat:'piscine',who:'Fahida',done:'8:05'},
+  {id:'c2',name:'Patio & fontaine',detail:'Avant le petit-déjeuner',time:'8:30',cat:'communes',who:'Fatim Zara'},
+  {id:'c3',name:'Salons & réception',detail:'',time:'8:00',cat:'communes',who:'Fatim Zara'},
+  {id:'c4',name:'Nettoyage piscine',detail:'Épuisette, ligne d\'eau, aspirateur',time:'9:00',cat:'piscine',who:'Fatim Zara'},
+  {id:'c5',name:'Relevé piscine',detail:'pH, chlore, température',time:'15:00',cat:'piscine',who:'Leila'}
+ ],
+ rec:[
+  {id:'r1',name:'Ouverture des jacuzzis',time:'8:00',cat:'piscine',days:[1,2,3,4,5,6,7],who:'Fahida',repl:'Fatim Zara'},
+  {id:'r2',name:'Patio & fontaine',time:'8:30',cat:'communes',days:[1,2,3,4,5,6,7],who:'Fatim Zara',repl:'Leila'},
+  {id:'r3',name:'Nettoyage piscine',time:'9:00',cat:'piscine',days:[1,3,5],who:'Fatim Zara',repl:''},
+  {id:'r4',name:'Arrosage des plantes',time:'Nuit',cat:'communes',days:[3,7],who:'Moshnine',repl:''},
+  {id:'r5',name:'Fermeture des jacuzzis',time:'22:00',cat:'piscine',days:[1,2,3,4,5,6,7],who:'Moshnine',repl:''}
+ ],
+ rest:{'Fahida':1,'Fatim Zara':2,'Leila':7,'Moshnine':4},
+ plan:null,
+ recTab:'tache',
+ bdf:{
+  E1:{pers:[{b:'Café',o:'Au plat'},{b:'Café',o:'Au plat'}],heure:'8:00',depart:'',allerg:'',menu:false,int:[]},
+  E3:{pers:[{b:'Thé marocain',o:'Pas d\'œufs'}],heure:'8:30',depart:'',allerg:'Végétarienne',menu:true,int:['Excursions']},
+  S2:{pers:[{b:'Café',o:'Brouillés'},{b:'Thé anglais',o:'Brouillés'}],heure:'9:00',depart:'',allerg:'',menu:true,int:['Spa']},
+  T1:{pers:[{b:'Café',o:'Brouillés'},{b:'Café',o:'Pas d\'œufs'},{b:'Chocolat',o:'À la coque'}],heure:'9:30',depart:'',allerg:'Arachides (enfant)',menu:false,int:['Quad']}
+ },
+ draft:null,
+ spa:[
+  {id:'sp1',start:'11:00',end:'11:55',name:'Hammam Prestige DUO',cat:'hammam',room:'S2',guest:'M. et Mme Laurent'},
+  {id:'sp2',start:'15:00',end:'15:55',name:'Massage Tradition',cat:'massage',ext:true,guest:'Mme Benali',pay:'À régler sur place'},
+  {id:'sp3',start:'17:00',end:'17:50',name:'Soin du visage',cat:'soin',room:'E1',guest:'Mme Durand'}
+ ],
+ spaDone:{},
+ acts:[
+  {kind:'Montgolfière',time:'5:15',end:'11:00',room:'S2',pax:2,detail:'Ciel d\'Afrique · vol classique · prise en charge au riad',src:'Montgolfière',cuisine:'Petit-déjeuner pris pendant le vol',menage:'Chambre libre dès 5:15 : à faire en premier'},
+  {kind:'Excursion',time:'9:00',end:'17:30',room:'T1',pax:3,detail:'Vallée de l\'Ourika · en français · chauffeur Hassan',src:'Excursions',cuisine:'Petit-déjeuner à 8:00 au plus tard',menage:'Absents toute la journée'},
+  {kind:'Transfert départ',time:'10:15',room:'E3',pax:1,detail:'Riad → aéroport Menara · vol de 13:05',src:'Transferts',cuisine:'Petit-déjeuner avant 9:30'},
+  {kind:'Cours de cuisine',time:'10:30',end:'13:00',room:'E1',pax:2,detail:'Avec Tarik, suivi du déjeuner',src:'Cours de cuisine',cuisine:'Marché pour 2 personnes de plus'},
+  {kind:'Transfert arrivée',time:'13:40',room:'S3',pax:2,detail:'Aéroport Menara → riad · vol AT 801 de Paris',src:'Transferts',menage:'Agafay prête avant 14:30'}
+ ],
+ demain:{
+  arr:[{room:'S3',guest:'M. et Mme Benoît',pax:2,pays:'France',time:'14:30',note:'Transfert aéroport réservé'},{room:'E4',guest:'Mme Ito',pax:1,pays:'Japon',time:'18:00',note:'Première visite au Maroc'}],
+  meals:[{time:'13:00',type:'Déjeuner',room:'E1',pax:2,note:'Après le cours de cuisine'},{time:'20:00',type:'Dîner',room:'S2',pax:2,note:''},{time:'20:00',type:'Dîner',room:'T1',pax:3,note:'Menu enfant'},{time:'20:30',type:'Dîner',ext:'Table extérieure · M. Alami',pax:4,note:''}],
+  rappels:['Anyssates : anniversaire de mariage, pétales et carte en chambre pendant le dîner','Victoire : allergie arachides (enfant) au panier pique-nique de l\'excursion','Agafay et Blanche : bouteille d\'eau et mot d\'accueil']
+ },
+ linen:[
+  {n:'Draps grand lit',give:8,back:6,send:8,stock:9,min:6},
+  {n:'Draps 90',give:6,back:6,send:5,stock:12,min:6},
+  {n:'Housses de couette',give:7,back:7,send:7,stock:10,min:6},
+  {n:'Taies d\'oreiller',give:14,back:14,send:14,stock:24,min:12},
+  {n:'Serviettes de bain',give:12,back:10,send:14,stock:6,min:10},
+  {n:'Serviettes de main',give:12,back:12,send:12,stock:20,min:10},
+  {n:'Tapis de bain',give:7,back:7,send:7,stock:12,min:6},
+  {n:'Peignoirs',give:0,back:0,send:2,stock:11,min:6}
+ ],
+ linenRet:false,linenSent:false,
+ shop:[
+  {g:'Marché · acheté par Tarik',items:[{n:'Œufs',q:'2 plateaux'},{n:'Menthe fraîche',q:'5 bottes',done:true},{n:'Oranges à jus',q:'6 kg'}]},
+  {g:'Épicerie · commandé',items:[{n:'Lait',q:'12 L'},{n:'Thé vert',q:'4 paquets'}]},
+  {g:'Boulangerie · commandé',items:[{n:'Croissants (congélateur)',q:'40'},{n:'Pains au chocolat (congélateur)',q:'30'},{n:'Pain français',q:'Commande quotidienne'}]}
+ ],
+ stock:[{n:'Œufs',q:12,min:30,u:''},{n:'Lait',q:2,min:6,u:' L'},{n:'Viennoiseries (congélateur)',q:46,min:40,u:''},{n:'Café en grains',q:3,min:2,u:' kg'},{n:'Huile d\'olive',q:4,min:3,u:' L'}],
+ orderSent:false,
+ buys:[
+  {id:'b0',kind:'valider',title:'Commande épicerie',by:'Tarik',detail:'Lait 12 L · Thé vert 4 paquets',amount:380,state:'attente'},
+  {id:'b1',kind:'controle',title:'Marché · 2 déc.',amount:640,ticket:true,flags:[['crit','Hors liste : fromage de chèvre'],['warn','Prix inhabituel : oranges']],state:'attente'},
+  {id:'b2',kind:'controle',title:'Livraison épicerie · 1er déc.',amount:410,ticket:true,flags:[['crit','Lait : 10 L reçus sur 12 L facturés']],state:'attente'},
+  {id:'b3',kind:'controle',title:'Achat du 30 nov.',amount:150,ticket:false,flags:[['crit','Sans ticket : à fournir avant remboursement']],state:'attente'}
+ ],
+ tonight:{diners:[{time:'20:00',room:'S2',pax:2,note:'Anniversaire de mariage : pétales et carte'},{time:'20:30',room:'E1',pax:2,note:''}],arrivees:2},
+ nuit:{},nuitN:{},nuitDone:null,nuitCtl:null,
+ view:'home',param:null,signal:{},comment:''
+};
+
+try{var saved=localStorage.getItem('anyssates-role');if(saved)S.role=saved;}catch(e){}
+
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+function now(){var d=new Date();return d.getHours()+':'+String(d.getMinutes()).padStart(2,'0');}
+function role(){return ROLES.find(function(r){return r.id===S.role;});}
+function can(v){return S.role&&ACCESS[S.role]&&ACCESS[S.role].indexOf(v)>=0;}
+function room(id){return S.rooms.find(function(r){return r.id===id;});}
+function toMin(t){var p=t.split(':');return (+p[0])*60+(+p[1]);}
+function fromMin(m){return Math.floor(m/60)+':'+String(m%60).padStart(2,'0');}
+var tt;function toast(m){var el=document.getElementById('toast');el.textContent=m;el.hidden=false;clearTimeout(tt);tt=setTimeout(function(){el.hidden=true;},2600);}
+function go(v,p){S.view=v;S.param=p||null;render();window.scrollTo(0,0);}
+
+var I={
+ home:'<path d="M3 21V8l9-5 9 5v13"/><path d="M9 21v-7h6v7"/>',
+ check:'<path d="M9 11l3 3 8-8"/><path d="M20 12v7a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h9"/>',
+ cal:'<rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>',
+ repeat:'<path d="M17 1l4 4-4 4"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><path d="M7 23l-4-4 4-4"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/>',
+ linen:'<rect x="4" y="2" width="16" height="20" rx="2"/><circle cx="12" cy="13" r="5"/><path d="M8 6h.01M11 6h.01"/>',
+ cam:'<path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/>',
+ flame:'<path d="M12 2c3 4 6 6.5 6 11a6 6 0 0 1-12 0c0-2.5 1.2-4.4 3-6 .3 2 1.3 3 3 3-1-3 0-6 0-8z"/>',
+ cup:'<path d="M4 9h13v5a6 6 0 0 1-6 6h-1a6 6 0 0 1-6-6z"/><path d="M17 10h1.5a2.5 2.5 0 0 1 0 5H17"/>',
+ fork:'<path d="M7 2v20"/><path d="M4 2v6a3 3 0 0 0 6 0V2"/><path d="M17 2c-2 2-3 5-3 8h3v12"/>',
+ receipt:'<path d="M5 2h14v20l-3-2-2 2-2-2-2 2-2-2-3 2z"/><path d="M9 7h6M9 11h6M9 15h4"/>',
+ warn:'<path d="M12 9v4"/><path d="M12 17h.01"/><path d="M10.3 3.9L1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/>',
+ ok:'<path d="M20 6L9 17l-5-5"/>',
+ moon:'<path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/>',
+ user:'<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>'
+};
+function ic(n,col){return '<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"'+(col?' style="stroke:'+col+'"':'')+'>'+I[n]+'</svg>';}
+function back(label,to){return '<div class="top"><button class="back" data-go="'+(to||'home')+'">‹ '+esc(label||'Accueil')+'</button><span class="small muted">Démo</span></div>';}
+function statusPill(r){return r.status==='depart'?'<span class="pill p-crit">Départ</span>':r.status==='recouche'?'<span class="pill p-ok">Recouche</span>':'<span class="pill p-neutral">Libre</span>';}
+function mPill(r){if(r.status==='libre')return '';return r.m==='prete'?'<span class="pill p-ok">Prête'+(r.mt?' · '+r.mt:'')+'</span>':r.m==='encours'?'<span class="pill p-warn">En cours</span>':'<span class="pill p-neutral">À faire</span>';}
+function catSw(c){return '<span class="sw" style="background:'+(c==='piscine'?'var(--info-ink)':c==='communes'?'var(--warn-ink)':'var(--accent)')+'" aria-hidden="true"></span>';}
+function opts(list,sel,empty){return (empty?'<option value="">'+empty+'</option>':'')+list.map(function(n){return '<option'+(n===sel?' selected':'')+'>'+esc(n)+'</option>';}).join('');}
+
+/* ---------- derived ---------- */
+var BOISSONS=['Café','Thé anglais','Thé marocain','Chocolat'];
+var OEUFS=['Pas d\'œufs','Au plat','Brouillés','À la coque','Omelette'];
+var HEURES=['7:30','8:00','8:30','9:00','9:30','10:00','10:30'];
+var INTERETS=['Spa','Excursions','Quad','Autres'];
+function bdTotals(){var t={pers:0,b:{},o:{},rooms:0};BOISSONS.forEach(function(x){t.b[x]=0;});OEUFS.forEach(function(x){t.o[x]=0;});Object.keys(S.bdf).forEach(function(id){var f=S.bdf[id];t.rooms++;f.pers.forEach(function(p){t.pers++;if(p.b)t.b[p.b]++;if(p.o)t.o[p.o]++;});});return t;}
+function mkDraft(rid){var f=S.bdf[rid];var r=room(rid);if(f)return {room:rid,pers:f.pers.map(function(p){return {b:p.b,o:p.o};}),heure:f.heure,depart:f.depart,allerg:f.allerg,menu:f.menu,int:f.int.slice()};var n=r.pax||1;var pers=[];for(var i=0;i<n;i++)pers.push({b:'',o:''});return {room:rid,pers:pers,heure:'8:30',depart:'',allerg:'',menu:false,int:[]};}
+function sansFiche(){return S.rooms.filter(function(r){return r.status!=='libre'&&!S.bdf[r.id];});}
+function linenAlerts(){
+ var a=[];var miss=S.linen.filter(function(l){return l.back<l.give;});
+ if(miss.length&&!S.linenRet)a.push(['crit','Retour incomplet · bon du 1er déc.','Manquent : '+miss.map(function(l){return (l.give-l.back)+' '+l.n.toLowerCase();}).join(', ')]);
+ a.push(['crit','Retour en retard · bon du 29 nov.','4 peignoirs pas revenus depuis 3 jours']);
+ S.linen.filter(function(l){return l.stock<l.min;}).forEach(function(l){a.push(['warn','Stock bas · '+l.n.toLowerCase(),l.stock+' en réserve, seuil à '+l.min]);});
+ return a;
+}
+function buildPlan(){
+ var tasks=[];
+ S.rec.forEach(function(r){if(r.days.indexOf(TOMORROW)<0)return;var w=r.who;if(S.rest[w]===TOMORROW)w=r.repl||'';tasks.push({id:'p'+r.id,name:r.name,time:r.time,cat:r.cat,who:w,note:r.who!==w?(w?'Remplace '+r.who+' (repos)':r.who+' en repos : à attribuer'):''});});
+ S.rooms.forEach(function(r){if(r.status==='libre')return;var depT=/Jeu\. 3/.test(r.dep||'');var a=S.acts.filter(function(x){return x.room===r.id&&x.menage;})[0];tasks.push({id:'pr'+r.id,name:r.name+' · '+(depT||r.status==='depart'?'départ':'recouche'),time:'',cat:'chambre',who:r.who||'',note:a?a.menage:''});});
+ S.demain.arr.forEach(function(x){var r=room(x.room);if(r.status!=='libre')return;var a=S.acts.filter(function(y){return y.room===x.room&&y.menage;})[0];tasks.push({id:'pa'+x.room,name:r.name+' · arrivée '+x.time,time:'',cat:'chambre',who:'',note:a?a.menage:'Prête avant '+x.time});});
+ S.plan=tasks;
+}
+
+function actsSorted(){return S.acts.slice().sort(function(a,b){return toMin(a.time)-toMin(b.time);});}
+function kindPill(k){var c=/Transfert/.test(k)?'p-info':/Montgolf/.test(k)?'p-warn':/Spa|Hammam|Massage|Soin/i.test(k)?'p-crit':'p-ok';return '<span class="pill '+c+'">'+esc(k)+'</span>';}
+function actsCard(field){
+ var list=actsSorted().filter(function(a){return !field||a[field];});
+ return '<div class="card list">'+list.map(function(a){var r=room(a.room);return '<div class="item" style="align-items:flex-start"><span class="time">'+a.time+'</span><div class="grow"><div class="row" style="gap:6px;flex-wrap:wrap">'+kindPill(a.kind)+'<span class="t">'+esc(r.name)+'</span><span class="small muted">'+a.pax+' pers.</span></div><div class="small muted" style="margin-top:4px">'+esc(a.detail)+(a.end?' · retour vers '+a.end:'')+'</div>'+(field&&a[field]?'<div class="small" style="margin-top:4px;font-weight:600;color:var(--warn-ink)">→ '+esc(a[field])+'</div>':'')+'</div></div>';}).join('')+'</div>';
+}
+function spaTomorrow(){if(LIVE.state!=='ok')return null;var t1=ymd(1);return LIVE.items.filter(function(b){return b.start.slice(0,10)===t1;});}
+
+/* ---------- views ---------- */
+var V={};
+V.roles=function(){
+ return '<div class="stack" style="gap:6px"><div class="brand">Riad Anyssates</div><h1 class="display">Qui êtes-vous ?</h1><p class="muted" style="margin:0">Chaque profil ne voit que ce qui le concerne.</p></div>'+
+ '<div class="demo">Version de démonstration · seul le planning Spa est réel (Wix), le reste est un exemple.</div>'+
+ '<div class="roles">'+ROLES.map(function(r){return '<button class="role" data-role="'+r.id+'">'+ic('user')+'<span class="grow"><span class="t" style="display:block">'+esc(r.label)+(r.who!==r.label?' · '+esc(r.who):'')+'</span><span class="small muted">'+esc(r.desc)+'</span></span><span class="muted" aria-hidden="true">›</span></button>';}).join('')+'</div>';
+};
+V.home=function(){
+ if(can('spa')&&LIVE.state==='idle'&&LIVE.pin)setTimeout(loadSpa,0);
+ var R=role();var al=null;if(LIVE.state==='ok'&&LIVE.items.length){var b0=LIVE.items[0];var la=liveAlerts(b0)[0];if(la)al={time:la.time,txt:la.txt,when:dayLabel(b0.start.slice(0,10))};}
+ var tiles={
+  equipe:['user','Équipe',TEAM.length+' personnes'],
+  nuit:['moon','Check-list de nuit',S.nuitDone?'Clôturée à '+S.nuitDone+(S.nuitCtl?' · contrôlée':''):nuitStats().done+' / '+nuitStats().total+' faites'],
+  demain:['cal','Demain','Toute la journée · '+S.acts.length+' activités'],
+  chambres:['home','Chambres',S.rooms.filter(function(r){return r.status!=='libre';}).length+' occupées'],
+  menage:['check','Ménage',S.rooms.filter(function(r){return r.m==='prete';}).length+' / '+S.rooms.filter(function(r){return r.status!=='libre';}).length+' prêtes'],
+  planning:['cal','Planning de demain','À préparer le soir'],
+  taches:['repeat','Tâches récurrentes','Jours de repos'],
+  blanchisserie:['linen','Blanchisserie',linenAlerts().length+' alertes',true],
+  mestaches:['cam',S.role==='femme'?'Mes chambres':'Mes tâches',S.role==='femme'?'Ma journée':'Vue femme de chambre'],
+  spa:['flame','Spa',LIVE.state==='ok'?LIVE.items.length+' soin'+(LIVE.items.length>1?'s':'')+' à venir':'Planning réel Wix'],
+  petitdej:['cup','Petit-déjeuner',bdTotals().pers+' personnes'+(sansFiche().length?' · '+sansFiche().length+' sans fiche':''),sansFiche().length>0],
+  cuisine:['fork','Cuisine',S.stock.filter(function(s){return s.q<s.min;}).length+' produits à commander',true],
+  achats:['receipt','Contrôle des achats',S.buys.filter(function(b){return b.state==='attente';}).length+' à vérifier',true]
+ };
+ var list=ACCESS[S.role].filter(function(v){return tiles[v];});
+ return '<div class="top"><span class="brand">Riad Anyssates</span><button class="back" data-act="switch">Changer de profil</button></div>'+
+ '<div><h1 class="display">Bonjour '+esc(R.who)+'</h1><div class="muted small" style="margin-top:6px">Démo · 3 départs · 4 recouches</div></div>'+
+ (al&&can('spa')?'<div class="alert crit">'+ic('flame','currentColor')+'<div class="grow small"><b>'+esc(al.when)+' · '+al.time+'</b> · '+esc(al.txt)+'</div></div>':'')+
+ '<div class="grid2">'+list.map(function(v){var t=tiles[v];return '<button class="tile" data-go="'+v+'">'+ic(t[0])+'<span><span class="t" style="display:block">'+esc(t[1])+'</span><span class="sub'+(t[3]?' crit':'')+'">'+esc(t[2])+'</span></span></button>';}).join('')+'</div>'+
+ '<div class="demo">Démo : seul le Spa est branché sur Wix. Les autres actions restent sur ce téléphone.</div>';
+};
+V.chambres=function(){
+ var ints=Object.keys(S.bdf).filter(function(id){return S.bdf[id].int.length;});
+ return back()+'<h1 class="display">Chambres</h1>'+(ints.length?'<div class="card" style="padding:14px 16px"><div class="label">À proposer par la réception</div><div class="xs muted" style="margin-top:2px">D\'après la fiche petit-déjeuner (Intéressé par)</div>'+ints.map(function(id){return '<div class="between small" style="margin-top:8px"><span class="t">'+esc(room(id).name)+'</span><span>'+S.bdf[id].int.map(function(x){return '<span class="pill p-info" style="margin-left:4px">'+x+'</span>';}).join('')+'</span></div>';}).join('')+'</div>':'')+[['libre','Libres'],['recouche','Recouches'],['depart','Départs']].map(function(g){var rs=S.rooms.filter(function(r){return r.status===g[0];});if(!rs.length)return '';return '<div class="stack"><h2 class="sec">'+g[1]+' <span class="n">· '+rs.length+'</span></h2><div class="card list">'+rs.map(function(r){return '<button class="item" style="width:100%;background:none;border:0;border-bottom:1px solid var(--line2);text-align:left;cursor:pointer;color:var(--fg)" data-go="fiche" data-p="'+r.id+'"><span class="grow"><span class="t" style="display:block">'+esc(r.name)+'</span><span class="small muted">'+esc(r.type)+' · '+(r.guest?esc(r.guest)+' · '+r.pax+' pers.':'Libre ce soir')+'</span>'+(r.notes?'<span class="small" style="display:block;margin-top:6px;padding:6px 10px;border-radius:8px;background:var(--warn-soft);color:var(--warn-ink)"><b>Notes :</b> '+esc(r.notes)+'</span>':'')+'</span>'+statusPill(r)+'</button>';}).join('')+'</div></div>';}).join('');
+};
+V.fiche=function(){
+ var r=room(S.param);var prog=[];
+ var f=S.bdf[r.id];if(f)prog.push([f.heure,'Petit-déjeuner',f.pers.map(function(p){return p.b+(p.o&&p.o!==OEUFS[0]?' + '+p.o.toLowerCase():'');}).join(' · ')]);
+ S.spa.forEach(function(s){if(s.room===r.id)prog.push([s.start,s.name,'Spa']);});
+ S.acts.forEach(function(a){if(a.room===r.id)prog.push([a.time,a.kind+' · demain',a.detail]);});
+ if(r.id==='S2')prog.push(['20:00','Dîner · 2 couverts','Restaurant du riad']);
+ return back('Chambres','chambres')+
+ '<div class="stack"><div class="label">'+esc(r.type)+'</div><h1 class="display" style="font-size:40px">'+esc(r.name)+'</h1><div class="row" style="flex-wrap:wrap;gap:8px">'+statusPill(r)+(r.status!=='libre'?'<span class="pill p-neutral">Ménage : '+esc(r.who||'non attribué')+'</span>'+mPill(r):'')+'</div></div>'+
+ (r.guest?'<div class="card" style="padding:16px;display:flex;flex-direction:column;gap:12px"><div><div class="t" style="font-size:18px">'+esc(r.guest)+'</div><div class="small muted">'+esc(r.pays)+' · '+r.pax+' pers.</div></div><div class="grid2" style="border-top:1px solid var(--line2);padding-top:12px"><div><div class="xs muted">Arrivée</div><div>'+esc(r.arr)+'</div></div><div><div class="xs muted">Départ</div><div>'+esc(r.dep)+'</div></div></div></div>':'<div class="card item muted">Pas de client ce soir.</div>')+
+ (r.notes?'<div class="alert warn"><div class="grow"><div class="label" style="color:inherit">Notes Octorate</div><div style="margin-top:4px;color:var(--fg)">'+esc(r.notes)+'</div></div></div>':'')+
+ (r.status!=='libre'?'<button class="btn ghost block" data-act="bdedit" data-p="'+r.id+'">'+(S.bdf[r.id]?'Modifier la fiche petit-déjeuner':'Remplir la fiche petit-déjeuner')+'</button>':'')+
+ (prog.length?'<div class="stack"><h2 class="display" style="font-size:24px">Programme du jour</h2><div class="card list">'+prog.sort(function(a,b){return toMin(a[0])-toMin(b[0]);}).map(function(p){return '<div class="item"><span class="time">'+p[0]+'</span><span class="grow"><span style="display:block;font-weight:500">'+esc(p[1])+'</span><span class="small muted">'+esc(p[2])+'</span></span></div>';}).join('')+'</div></div>':'');
+};
+V.menage=function(){
+ var f=S.mfilter||null;
+ function cnt(st){return S.rooms.filter(function(r){return r.status===st;}).length;}
+ function tile(st,label,style,cls){var on=f===st;return '<button type="button" class="stat stbtn'+(cls?' '+cls:'')+(on?' on':'')+'" style="'+style+'" data-mfilter="'+st+'" aria-pressed="'+on+'"><div class="v">'+cnt(st)+'</div><div class="small">'+label+'</div></button>';}
+ var occ=S.rooms.filter(function(r){return r.status!=='libre';});
+ var shown=f?S.rooms.filter(function(r){return r.status===f;}):occ;
+ var order=shown.slice().sort(function(a,b){return (a.status==='depart'?0:1)-(b.status==='depart'?0:1);});
+ var title=f==='depart'?'Départs':f==='recouche'?'Recouches':f==='libre'?'Chambres libres':'À répartir';
+ function rowOf(r){
+  if(r.status==='libre')return '<div class="item"><div class="grow"><button class="back" style="min-height:0;color:var(--fg);font-weight:600" data-go="fiche" data-p="'+r.id+'">'+esc(r.name)+'</button><div class="xs muted" style="font-weight:600">Libre'+(r.type?' · '+esc(r.type):'')+'</div></div><span class="pill p-neutral">Libre</span></div>';
+  return '<div class="item"><div class="grow"><button class="back" style="min-height:0;color:var(--fg);font-weight:600" data-go="fiche" data-p="'+r.id+'">'+esc(r.name)+'</button><div class="xs" style="font-weight:600;color:'+(r.status==='depart'?'var(--crit-ink)':'var(--accent-ink)')+'">'+(r.status==='depart'?'Départ':'Recouche')+'</div></div><label class="sr" for="w-'+r.id+'">Femme de chambre pour '+esc(r.name)+'</label><select id="w-'+r.id+'" data-assign="'+r.id+'"'+(r.who?'':' class="unset"')+'>'+opts(FEMMES,r.who,'Non attribuée')+'</select>'+mPill(r)+'</div>';
+ }
+ return back()+'<div><h1 class="display">Ménage du jour</h1><div class="small muted" style="margin-top:4px">'+dayLabel(ymd(0))+'</div></div>'+
+ '<div class="grid3">'+tile('depart','Départs','background:var(--crit-soft);color:var(--crit-ink)')+tile('recouche','Recouches','background:var(--accent-soft);color:var(--accent-ink)')+tile('libre','Libres','','card')+'</div>'+
+ '<button class="btn primary block" data-go="planning">Préparer le planning de demain</button>'+
+ '<div class="grid2"><button class="btn ghost" data-go="blanchisserie">Blanchisserie</button><button class="btn ghost" data-go="taches">Tâches récurrentes</button></div>'+
+ (S.issues.length?'<div class="stack"><h2 class="sec">Signalements <span class="n">· '+S.issues.length+'</span></h2>'+S.issues.map(function(i){return '<div class="alert crit">'+ic('warn','currentColor')+'<div class="grow small"><b>'+esc(i.room)+'</b> · '+esc(i.by)+' : '+esc(i.txt)+'</div></div>';}).join('')+'</div>':'')+
+ '<div class="stack"><div class="between"><h2 class="sec">'+title+(f?' <span class="n">· '+shown.length+'</span>':'')+'</h2>'+(f?'<button class="back" style="min-height:0;font-size:13px" data-mfilter="'+f+'">Tout afficher</button>':'<span class="small muted">Prêtes : '+occ.filter(function(r){return r.m==='prete';}).length+' / '+occ.length+'</span>')+'</div><div class="card list">'+(order.length?order.map(rowOf).join(''):'<div class="item muted">Aucune chambre</div>')+'</div></div>';
+};
+V.planning=function(){
+ if(!S.plan)buildPlan();
+ var un=S.plan.filter(function(t){return !t.who;});
+ var people=STAFF.filter(function(p){return S.plan.some(function(t){return t.who===p;});});
+ function row(t){return '<div class="item">'+catSw(t.cat)+'<div class="grow"><div class="t" style="font-size:14px">'+(t.time?'<span class="muted" style="font-weight:500">'+t.time+' · </span>':'')+esc(t.name)+'</div>'+(t.note?'<div class="xs" style="color:var(--warn-ink)">'+esc(t.note)+'</div>':'')+'</div><label class="sr" for="pl-'+t.id+'">Attribuer '+esc(t.name)+'</label><select id="pl-'+t.id+'" data-plan="'+t.id+'"'+(t.who?'':' class="unset"')+'>'+opts(STAFF,t.who,'Choisir…')+'</select></div>';}
+ return back('Ménage','menage')+'<div><h1 class="display">Planning de demain</h1><div class="small muted" style="margin-top:4px">'+dayLabel(ymd(1))+' · construit à partir des réservations et des tâches récurrentes</div></div>'+
+ '<div class="stack"><div class="between"><h2 class="sec">Activités des clients</h2><button class="back" style="min-height:0;font-size:13px" data-go="demain">Voir toute la journée ›</button></div>'+actsCard('menage')+(function(){var sp=spaTomorrow();return sp===null?'<div class="small muted">Spa : ouvrez l\'écran Spa pour charger les soins de demain depuis Wix.</div>':'<div class="small muted">Spa : '+(sp.length?sp.length+' soin'+(sp.length>1?'s':'')+' demain (Wix)':'aucun soin demain (Wix)')+'</div>';})()+'</div>'+
+ '<div class="row" style="flex-wrap:wrap;gap:8px"><span class="pill p-ok">Chambres</span><span class="pill p-warn">Parties communes</span><span class="pill p-info">Piscine &amp; jacuzzis</span></div>'+
+ (un.length?'<div class="stack"><h2 class="sec" style="color:var(--crit-ink)">À attribuer · '+un.length+'</h2><div class="card list" style="border-color:var(--crit-ink)">'+un.map(row).join('')+'</div></div>':'<div class="alert" style="background:var(--accent-soft);color:var(--accent-ink)">'+ic('ok','currentColor')+'<div class="grow small">Toutes les tâches sont attribuées.</div></div>')+
+ people.map(function(p){var ts=S.plan.filter(function(t){return t.who===p;});return '<div class="stack"><div class="between"><h2 class="display" style="font-size:24px">'+esc(p)+'</h2><span class="small muted">'+ts.length+' tâche'+(ts.length>1?'s':'')+'</span></div><div class="card list">'+ts.map(row).join('')+'</div></div>';}).join('')+
+ '<button class="btn primary block" data-act="sendplan"'+(un.length?' disabled':'')+'>Envoyer le planning</button>'+(un.length?'<div class="xs muted" style="text-align:center">Attribuez d\'abord toutes les tâches.</div>':'');
+};
+V.taches=function(){
+ return back('Ménage','menage')+'<div><h1 class="display">Tâches récurrentes</h1><div class="small muted" style="margin-top:4px">Chaque tâche a ses jours et son responsable. Le jour de repos, elle passe à la remplaçante.</div></div>'+
+ S.rec.map(function(r){return '<div class="card" style="padding:14px 16px;display:flex;flex-direction:column;gap:10px"><div class="row">'+catSw(r.cat)+'<div class="grow"><div class="t">'+esc(r.name)+'</div><div class="xs muted">'+esc(r.time)+'</div></div></div>'+
+  '<div class="days" role="group" aria-label="Jours pour '+esc(r.name)+'">'+[1,2,3,4,5,6,7].map(function(d){var on=r.days.indexOf(d)>=0;return '<button class="day'+(on?' on':'')+'" aria-pressed="'+on+'" aria-label="'+DAYS[d]+'" data-day="'+r.id+'|'+d+'">'+D1[d]+'</button>';}).join('')+'</div>'+
+  '<div class="grid2" style="border-top:1px solid var(--line2);padding-top:10px"><div><label class="xs muted" for="rw-'+r.id+'">Responsable</label><select id="rw-'+r.id+'" data-recwho="'+r.id+'" style="width:100%;max-width:none">'+opts(STAFF,r.who)+'</select></div><div><label class="xs muted" for="rr-'+r.id+'">Remplaçante (repos)</label><select id="rr-'+r.id+'" data-recrepl="'+r.id+'" style="width:100%;max-width:none">'+opts(STAFF,r.repl,'Personne')+'</select></div></div></div>';}).join('')+
+ '<div class="stack"><h2 class="sec">Jours de repos</h2><div class="card list">'+STAFF.map(function(p,i){return '<div class="item"><span class="grow t">'+esc(p)+'</span><label class="sr" for="rest-'+i+'">Jour de repos de '+esc(p)+'</label><select id="rest-'+i+'" data-rest="'+esc(p)+'">'+[1,2,3,4,5,6,7].map(function(d){return '<option value="'+d+'"'+(S.rest[p]===d?' selected':'')+'>'+DAYS[d]+'</option>';}).join('')+'</select></div>';}).join('')+'</div></div>'+
+ '<div class="alert warn small"><div class="grow"><b>Un changement pour un seul jour ?</b> Il se fait dans le planning de demain, sans toucher à la règle.</div></div>';
+};
+V.blanchisserie=function(){
+ var al=linenAlerts();
+ return back('Ménage','menage')+'<div><h1 class="display">Blanchisserie</h1><div class="small muted" style="margin-top:4px">Fahida · passage du livreur vers 10:00</div></div>'+
+ '<div class="stack"><h2 class="sec">Alertes <span class="n">· '+al.length+'</span></h2>'+al.map(function(a){return '<div class="alert '+a[0]+'">'+ic(a[0]==='crit'?'warn':'linen','currentColor')+'<div class="grow"><div class="t small">'+esc(a[1])+'</div><div class="small">'+esc(a[2])+'</div></div></div>';}).join('')+'</div>'+
+ '<div class="stack"><div class="between"><h2 class="sec">Retour à contrôler</h2><span class="small muted">Bon du 1er déc.</span></div>'+
+ (S.linenRet?'<div class="alert" style="background:var(--accent-soft);color:var(--accent-ink)">'+ic('ok','currentColor')+'<div class="grow small">Retour validé. Les manquants restent suivis jusqu\'au prochain passage.</div></div>':
+ '<div class="card"><div class="tbl head"><div>Article</div><div>Donné</div><div>Revenu</div><div>Écart</div></div>'+S.linen.filter(function(l){return l.give;}).map(function(l){var d=l.back-l.give;return '<div class="tbl'+(d<0?' bad':'')+'" style="border-top:1px solid var(--line2)"><div>'+esc(l.n)+'</div><div>'+l.give+'</div><div>'+l.back+'</div><div class="'+(d<0?'neg':'ok')+'">'+(d<0?'−'+(-d):'✓')+'</div></div>';}).join('')+'</div>'+
+ '<div class="grid2"><label class="btn ghost" style="display:flex;align-items:center;justify-content:center;position:relative">Photo du bon<input type="file" accept="image/*" capture="environment" data-file="bon" style="position:absolute;inset:0;opacity:0"></label><button class="btn primary" data-act="linenret">Valider le retour</button></div>')+'</div>'+
+ '<div class="stack"><div class="between"><h2 class="sec">Envoi d\'aujourd\'hui</h2><span class="small muted">3 départs + 4 recouches</span></div>'+
+ (S.linenSent?'<div class="alert" style="background:var(--accent-soft);color:var(--accent-ink)">'+ic('ok','currentColor')+'<div class="grow small">Bon d\'envoi créé : '+S.linen.reduce(function(s,l){return s+l.send;},0)+' pièces envoyées.</div></div>':
+ '<div class="card list">'+S.linen.map(function(l,i){return '<div class="item" style="padding:6px 10px 6px 14px"><span class="grow">'+esc(l.n)+'</span><div class="step"><button aria-label="Moins de '+esc(l.n)+'" data-step="'+i+'|-1">−</button><b>'+l.send+'</b><button aria-label="Plus de '+esc(l.n)+'" data-step="'+i+'|1">+</button></div></div>';}).join('')+'</div><button class="btn primary block" data-act="linensend">Valider l\'envoi et créer le bon</button>')+'</div>'+
+ '<div class="stack"><h2 class="sec">Stock en réserve</h2><div class="grid2">'+S.linen.map(function(l){var low=l.stock<l.min;return '<div class="stat" style="'+(low?'background:var(--crit-soft);color:var(--crit-ink)':'background:var(--surface);border:1px solid var(--line)')+'"><div class="v" style="font-size:22px">'+l.stock+'</div><div class="small">'+esc(l.n)+(low?' · seuil '+l.min:'')+'</div></div>';}).join('')+'</div></div>';
+};
+V.mestaches=function(){
+ var me=S.role==='femme'?'Fatim Zara':(S.param||'Fatim Zara');
+ var rooms=S.rooms.filter(function(r){return r.who===me&&r.status!=='libre';});
+ var cur=rooms.find(function(r){return r.m==='encours';})||rooms.find(function(r){return r.m==='afaire';});
+ var common=S.common.filter(function(c){return c.who===me;});
+ var sig=S.signal[cur&&cur.id]||{};
+ return (S.role==='femme'?'<div class="top"><span class="brand">Riad Anyssates</span><button class="back" data-act="switch">Changer de profil</button></div>':back())+
+ (S.role!=='femme'?'<div><label class="xs muted" for="who-me">Voir la journée de</label><select id="who-me" data-me="1" style="max-width:none;width:100%">'+opts(FEMMES,me)+'</select></div>':'')+
+ '<div><h1 class="display">Bonjour '+esc(me)+'</h1><div class="small muted" style="margin-top:4px">'+rooms.length+' chambres · '+common.length+' parties communes · '+rooms.filter(function(r){return r.m==='prete';}).length+' prête'+(rooms.filter(function(r){return r.m==='prete';}).length>1?'s':'')+'</div></div>'+
+ (cur?'<div class="card" style="padding:16px;display:flex;flex-direction:column;gap:14px"><div><div class="label" style="color:var(--warn-ink)">'+(cur.m==='encours'?'En cours':'Suivante')+'</div><div class="display" style="font-size:30px;line-height:1.1">'+esc(cur.name)+'</div><div class="small" style="font-weight:600;color:'+(cur.status==='depart'?'var(--crit-ink)':'var(--accent-ink)')+'">'+(cur.status==='depart'?'Départ':'Recouche')+(cur.notes&&cur.status==='depart'?' · '+esc(cur.notes):'')+'</div></div>'+
+  '<div class="grid2">'+photoBox(cur,'in')+photoBox(cur,'out')+'</div>'+
+  '<div class="stack"><div class="t small">Signaler un problème</div><div class="chips">'+['Ampoule','Fuite d\'eau','Linge manquant','Objet oublié','Autre'].map(function(c){return '<button class="chip'+(sig[c]?' on':'')+'" aria-pressed="'+!!sig[c]+'" data-sig="'+cur.id+'|'+c+'">'+c+'</button>';}).join('')+'</div><label for="cm" class="small muted">Commentaire</label><textarea id="cm" rows="2" placeholder="Décrire ce qui ne va pas…" data-comment="1">'+esc(S.comment)+'</textarea><button class="btn" data-act="sendsig" data-p="'+cur.id+'">Envoyer à la gouvernante</button></div></div>':'<div class="alert" style="background:var(--accent-soft);color:var(--accent-ink)">'+ic('ok','currentColor')+'<div class="grow small">Toutes vos chambres sont prêtes.</div></div>')+
+ (common.length?'<div class="stack"><h2 class="sec">Parties communes &amp; piscine</h2><div class="card list">'+common.map(function(c){return '<div class="item">'+catSw(c.cat)+'<div class="grow"><div class="t">'+esc(c.name)+'</div><div class="xs muted">'+c.time+(c.detail?' · '+esc(c.detail):'')+'</div></div>'+(c.done?'<span class="pill p-ok">Fait · '+c.done+'</span>':'<button class="btn" data-done="'+c.id+'">Fait</button>')+'</div>';}).join('')+'</div></div>':'')+
+ '<div class="stack"><h2 class="sec">Mes chambres</h2><div class="card list">'+rooms.map(function(r){return '<div class="item"><div class="grow"><div class="t">'+esc(r.name)+'</div><div class="xs" style="font-weight:600;color:'+(r.status==='depart'?'var(--crit-ink)':'var(--accent-ink)')+'">'+(r.status==='depart'?'Départ':'Recouche')+'</div></div>'+mPill(r)+'</div>';}).join('')+'</div></div>';
+};
+function photoBox(r,k){
+ var t=k==='in'?r.pin:r.pout;var img=k==='in'?r.imgIn:r.imgOut;
+ var disabled=k==='out'&&!r.pin;
+ if(t)return '<div class="photo done">'+(img?'<img src="'+img+'" alt="Photo '+(k==='in'?'d\'entrée':'de sortie')+'">':ic('ok','currentColor'))+'<div><div class="t small">Photo '+(k==='in'?'d\'entrée':'de sortie')+'</div><div class="xs">Prise à '+t+'</div></div></div>';
+ return '<label class="photo '+(disabled?'done':'todo')+'" style="'+(disabled?'opacity:.55':'')+'">'+ic('cam','currentColor')+'<div><div class="t small">Photo '+(k==='in'?'d\'entrée':'de sortie')+'</div><div class="xs">'+(k==='in'?'En entrant dans la chambre':disabled?'Après la photo d\'entrée':'Chambre prête')+'</div></div>'+(disabled?'':'<input type="file" accept="image/*" capture="environment" data-photo="'+r.id+'|'+k+'" aria-label="Prendre la photo '+(k==='in'?'d\'entrée':'de sortie')+' de '+esc(r.name)+'">')+'</label>';
+}
+function guestOf(id){var a=S.demain.arr.filter(function(x){return x.room===id;})[0];return a?a.guest:(room(id).guest||'');}
+V.demain=function(){
+ if(can('spa')&&LIVE.state==='idle'&&LIVE.pin)setTimeout(loadSpa,0);
+ if(!S.plan)buildPlan();
+ var deps=S.rooms.filter(function(r){return /Jeu\. 3/.test(r.dep||'');});
+ var arr=S.demain.arr;
+ var rec=S.rooms.filter(function(r){return r.guest&&r.status!=='libre'&&!/Jeu\. 3/.test(r.dep||'')&&r.status!=='depart';});
+ var t=bdTotals();var miss=sansFiche();
+ var sp=spaTomorrow();
+ var ev=[];
+ actsSorted().forEach(function(a){ev.push({t:a.time,k:a.kind,who:room(a.room).name+' · '+guestOf(a.room),d:a.detail+(a.end?' · retour vers '+a.end:'')});});
+ deps.forEach(function(r){var m=(r.dep.match(/(\d+:\d+)/)||[])[1]||'11:00';ev.push({t:m,k:'Départ',who:r.name+' · '+r.guest,d:'Libérer la chambre, préparer la facture'});});
+ arr.forEach(function(x){ev.push({t:x.time,k:'Arrivée',who:room(x.room).name+' · '+x.guest,d:x.pax+' pers. · '+x.pays+(x.note?' · '+x.note:'')});});
+ S.demain.meals.forEach(function(m){ev.push({t:m.time,k:m.type,who:m.ext||(room(m.room).name+' · '+guestOf(m.room)),d:m.pax+' couverts'+(m.note?' · '+m.note:'')});});
+ if(sp)sp.forEach(function(b){var h=b.start.slice(11,16);ev.push({t:h,k:'Spa',who:b.name,d:b.guest+(b.people>1?' · '+b.people+' pers.':'')+' · réservé sur Wix'});liveAlerts(b).forEach(function(a){ev.push({t:a.time,k:'Spa',who:a.txt,d:a.sub,alert:true});});});
+ ev.sort(function(a,b){return toMin(a.t)-toMin(b.t);});
+ var people=STAFF.map(function(p){return [p,S.plan.filter(function(x){return x.who===p;}).length];}).filter(function(x){return x[1];});
+ var un=S.plan.filter(function(x){return !x.who;}).length;
+ var allerg=Object.keys(S.bdf).filter(function(id){return S.bdf[id].allerg;});
+ return '<div class="noprint">'+back()+'</div>'+
+ '<div><div class="label">Riad Anyssates · demain</div><h1 class="display" style="margin-top:4px">'+dayLabel(ymd(1))+'</h1><div class="small muted" style="margin-top:4px">Récapitulatif pour toute l\'équipe</div></div>'+
+ '<div class="grid2 noprint"><button class="btn primary" data-act="print">Imprimer / PDF</button><button class="btn ghost" data-go="planning">Planning ménage</button></div>'+
+ '<div class="grid3"><div class="stat card"><div class="v">'+arr.length+'</div><div class="small muted">Arrivées</div></div><div class="stat card"><div class="v">'+deps.length+'</div><div class="small muted">Départs</div></div><div class="stat card"><div class="v">'+(S.acts.length+(sp?sp.length:0))+'</div><div class="small muted">Activités</div></div></div>'+
+ '<div class="stack"><h2 class="display" style="font-size:24px">Programme de la journée</h2><div class="card list">'+ev.map(function(e){return '<div class="item" style="align-items:flex-start'+(e.alert?';background:var(--crit-soft)':'')+'"><span class="time">'+e.t+'</span><div class="grow"><div class="row" style="gap:6px;flex-wrap:wrap">'+kindPill(e.k)+'<span class="t small">'+esc(e.who)+'</span></div><div class="small muted" style="margin-top:4px">'+esc(e.d)+'</div></div></div>';}).join('')+'</div>'+
+ (sp===null?'<div class="small muted noprint">Les soins spa de demain s\'ajoutent ici dès que le planning Wix est chargé (écran Spa, code équipe).</div>':'')+'</div>'+
+ '<div class="stack"><h2 class="sec">Arrivées</h2><div class="card list">'+arr.map(function(x){return '<div class="item"><span class="time">'+x.time+'</span><div class="grow"><div class="t">'+esc(room(x.room).name)+' · '+esc(x.guest)+'</div><div class="small muted">'+x.pax+' pers. · '+esc(x.pays)+(x.note?' · '+esc(x.note):'')+'</div></div></div>';}).join('')+'</div></div>'+
+ '<div class="stack"><h2 class="sec">Départs</h2><div class="card list">'+(deps.length?deps.map(function(r){return '<div class="item"><span class="time">'+((r.dep.match(/(\d+:\d+)/)||[])[1]||'')+'</span><div class="grow"><div class="t">'+esc(r.name)+' · '+esc(r.guest)+'</div><div class="small muted">'+r.pax+' pers.</div></div></div>';}).join(''):'<div class="item muted">Aucun départ</div>')+'</div><div class="small muted">Recouches : '+rec.map(function(r){return esc(r.name);}).join(', ')+'</div></div>'+
+ '<div class="stack"><h2 class="sec">Petit-déjeuner · '+t.pers+' personnes</h2><div class="card" style="padding:14px 16px;display:flex;flex-direction:column;gap:8px"><div class="small">'+BOISSONS.filter(function(b){return t.b[b];}).map(function(b){return t.b[b]+' '+b.toLowerCase();}).join(' · ')+'</div><div class="small">Œufs : '+OEUFS.slice(1).filter(function(o){return t.o[o];}).map(function(o){return t.o[o]+' '+o.toLowerCase();}).join(' · ')+'</div>'+
+ allerg.map(function(id){return '<div class="small" style="color:var(--crit-ink);font-weight:600">⚠ '+esc(room(id).name)+' : '+esc(S.bdf[id].allerg)+'</div>';}).join('')+
+ actsSorted().filter(function(a){return a.cuisine;}).map(function(a){return '<div class="small" style="color:var(--warn-ink)">'+esc(room(a.room).name)+' · '+esc(a.kind.toLowerCase())+' '+a.time+' → '+esc(a.cuisine)+'</div>';}).join('')+
+ (miss.length?'<div class="small muted">Sans fiche : '+miss.map(function(r){return esc(r.name);}).join(', ')+'</div>':'')+'</div></div>'+
+ '<div class="stack"><h2 class="sec">Ménage</h2><div class="card list">'+people.map(function(p){return '<div class="item"><span class="grow t">'+esc(p[0])+'</span><span class="small muted">'+p[1]+' tâche'+(p[1]>1?'s':'')+'</span></div>';}).join('')+(un?'<div class="item" style="color:var(--crit-ink)"><span class="grow t">À attribuer</span><span class="small">'+un+'</span></div>':'')+'</div></div>'+
+ '<div class="stack"><h2 class="sec">À ne pas oublier</h2><div class="card" style="padding:14px 16px"><ul style="margin:0;padding-left:18px;line-height:1.6" class="small">'+S.demain.rappels.map(function(x){return '<li>'+esc(x)+'</li>';}).join('')+'</ul></div></div>'+
+ '<div class="demo noprint">Démo : activités, arrivées et repas sont des exemples. En réel, ils viendront d\'Octorate et des formulaires Airtable (transferts, excursions, montgolfière…). Le spa est réel (Wix).</div>';
+};
+function nuitExtras(){return S.rec.filter(function(r){return r.who==='Moshnine'&&r.days.indexOf(TODAY)>=0&&!/jacuzzi/i.test(r.name);}).map(function(r){return ['rec-'+r.id,r.name+' (tâche récurrente)'];});}
+function nuitAuto(k){if(k==='diners')return S.tonight.diners.reduce(function(s,d){return s+d.pax;},0);if(k==='police')return S.tonight.arrivees;if(k==='viennoiseries')return bdTotals().pers;return '';}
+function nuitAll(){var a=[];NUIT.forEach(function(s){s.items.forEach(function(i){a.push(i);});});return a.concat(nuitExtras());}
+function nuitStats(){var all=nuitAll();var done=all.filter(function(i){return S.nuit[i[0]];}).length;var non=all.filter(function(i){return S.nuit[i[0]]&&S.nuit[i[0]].v==='non';});return {total:all.length,done:done,non:non};}
+function nuitRow(i){
+ var st=S.nuit[i[0]];var k=i[2];
+ var seg=['oui','non'].map(function(v){var on=st&&st.v===v;return '<button type="button" data-nuit="'+i[0]+'|'+v+'" aria-pressed="'+!!on+'" style="min-width:52px;min-height:40px;border:1px solid '+(on?(v==='oui'?'var(--accent)':'var(--crit-ink)'):'var(--line)')+';background:'+(on?(v==='oui'?'var(--accent)':'var(--crit-soft)'):'var(--field)')+';color:'+(on?(v==='oui'?'var(--accent-fg)':'var(--crit-ink)'):'var(--fg)')+';font-weight:600;font-size:13px;cursor:pointer;border-radius:'+(v==='oui'?'10px 0 0 10px':'0 10px 10px 0')+'">'+(v==='oui'?'Oui':'Non')+'</button>';}).join('');
+ var extra='';
+ if(k==='heure')extra='<label class="xs muted" style="display:flex;align-items:center;gap:6px;margin-top:6px">Heure <input type="time" data-nuitn="'+i[0]+'" value="'+esc(S.nuitN[i[0]]||'')+'" style="height:36px;border:1px solid var(--line);border-radius:8px;background:var(--field);padding:0 8px"></label>';
+ else if(k){var val=S.nuitN[i[0]]!=null?S.nuitN[i[0]]:nuitAuto(k);extra='<label class="xs muted" style="display:flex;align-items:center;gap:6px;margin-top:6px">Combien <input type="number" min="0" inputmode="numeric" data-nuitn="'+i[0]+'" value="'+esc(val)+'" style="width:70px;height:36px;border:1px solid var(--line);border-radius:8px;background:var(--field);padding:0 8px">'+(S.nuitN[i[0]]==null&&k!=='heure'?'<span>calculé par l\'appli</span>':'')+'</label>';}
+ return '<div class="item" style="align-items:flex-start"><div class="grow"><div class="small" style="font-weight:500'+(st&&st.v==='oui'?';color:var(--muted)':'')+'">'+esc(i[1])+'</div>'+extra+(st?'<div class="xs" style="margin-top:4px;color:'+(st.v==='oui'?'var(--accent-ink)':'var(--crit-ink)')+'">'+(st.v==='oui'?'Fait':'Pas fait / pas besoin')+' · '+st.t+'</div>':'')+'</div><div style="display:flex;flex-shrink:0">'+seg+'</div></div>';
+}
+V.nuit=function(){
+ var s=nuitStats();var night=S.role==='nuit';var ex=nuitExtras();
+ var left=s.total-s.done;
+ return (night?'<div class="top"><span class="brand">Riad Anyssates</span><button class="back" data-act="switch">Changer de profil</button></div>':back())+
+ '<div><div class="label">Réception de nuit</div><h1 class="display" style="margin-top:4px">Check-list de nuit</h1><div class="small muted" style="margin-top:4px">'+dayLabel(ymd(0))+' · Oui quand c\'est fait, Non si pas besoin</div></div>'+
+ (S.nuitDone?'<div class="alert" style="background:var(--accent-soft);color:var(--accent-ink)">'+ic('ok','currentColor')+'<div class="grow small"><b>Nuit clôturée à '+S.nuitDone+'</b>'+(S.nuitCtl?' · contrôlée par la direction à '+S.nuitCtl:'')+'</div>'+(!night&&!S.nuitCtl&&can('achats')?'<button class="btn" data-act="nuitctl">Contrôlé</button>':'')+'</div>':'')+
+ (!night&&s.non.length?'<div class="alert warn"><div class="grow small"><b>Cochés Non :</b> '+s.non.map(function(i){return esc(i[1]);}).join(' · ')+'</div></div>':'')+
+ '<div class="card" style="padding:14px 16px;display:flex;flex-direction:column;gap:8px"><div class="between"><span class="label">Avancement</span><span class="small" style="font-weight:600">'+s.done+' / '+s.total+'</span></div><div class="bar"><i style="width:'+Math.round(s.done/s.total*100)+'%"></i></div></div>'+
+ '<div class="card" style="padding:14px 16px;display:flex;flex-direction:column;gap:8px"><div class="label">Ce soir</div>'+S.tonight.diners.map(function(d){return '<div class="small"><b>'+d.time+'</b> · Dîner '+esc(room(d.room).name)+' · '+d.pax+' couverts'+(d.note?' · <span style="color:var(--warn-ink)">'+esc(d.note)+'</span>':'')+'</div>';}).join('')+'<div class="small">'+S.tonight.arrivees+' arrivées aujourd\'hui · '+bdTotals().pers+' petits-déjeuners demain</div></div>'+
+ (ex.length?'<div class="stack"><h2 class="sec">En plus ce soir</h2><div class="card list">'+ex.map(nuitRow).join('')+'</div></div>':'')+
+ NUIT.map(function(sec){return '<div class="stack"><h2 class="sec">'+(sec.h?'<span style="color:var(--accent-ink)">'+esc(sec.h)+'</span> · ':'')+esc(sec.t)+'</h2>'+(sec.items.length?'<div class="card list">'+sec.items.map(nuitRow).join('')+'</div>':'')+'</div>';}).join('')+
+ (night&&!S.nuitDone?'<button class="btn primary block" data-act="nuitdone"'+(left?' disabled':'')+'>Terminer la nuit</button>'+(left?'<div class="xs muted" style="text-align:center">Encore '+left+' ligne'+(left>1?'s':'')+' sans réponse.</div>':''):'');
+};
+var POSTES=['Femme de chambre','Gouvernante','Réception de jour','Réceptionniste de nuit','Cuisine','Spa','Direction'];
+V.equipe=function(){
+ return back()+'<div><h1 class="display">Équipe</h1><div class="small muted" style="margin-top:4px">Les personnes ajoutées ici apparaissent dans le planning, les chambres et les tâches.</div></div>'+
+ '<div class="card list">'+TEAM.map(function(t){return '<div class="item"><div class="grow"><div class="t">'+esc(t.n)+'</div><div class="small muted">'+esc(t.p)+'</div></div>'+(S.rest[t.n]?'<span class="pill p-neutral">Repos '+DAYS[S.rest[t.n]].toLowerCase()+'</span>':'')+'</div>';}).join('')+'</div>'+
+ '<form class="card" data-teamform="1" style="padding:14px 16px;display:flex;flex-direction:column;gap:10px"><div class="t">Ajouter un employé</div><div><label class="xs muted" for="tm-n">Prénom</label><input id="tm-n" autocomplete="off" style="width:100%;box-sizing:border-box;height:44px;border:1px solid var(--line);border-radius:10px;background:var(--field);padding:0 12px"></div><div class="grid2"><div><label class="xs muted" for="tm-p">Poste</label><select id="tm-p" style="max-width:none;width:100%">'+opts(POSTES)+'</select></div><div><label class="xs muted" for="tm-r">Jour de repos</label><select id="tm-r" style="max-width:none;width:100%"><option value="">—</option>'+[1,2,3,4,5,6,7].map(function(d){return '<option value="'+d+'">'+DAYS[d]+'</option>';}).join('')+'</select></div></div><button class="btn primary block" type="submit">Ajouter</button></form>';
+};
+V.petitdej=function(){
+ var t=bdTotals();var miss=sansFiche();
+ var ids=Object.keys(S.bdf).sort(function(a,b){return toMin(S.bdf[a].heure)-toMin(S.bdf[b].heure);});
+ var oeufsTot=OEUFS.slice(1).reduce(function(s,o){return s+t.o[o];},0);
+ return back()+'<div><div class="small muted">Démo · servi de 7:30 à 10:30</div><h1 class="display" style="margin-top:4px">Petit-déjeuner</h1></div>'+
+ '<div class="hero"><div class="label">À préparer · '+t.pers+' personnes · '+t.rooms+' chambres</div>'+
+ '<div class="grid2" style="gap:6px 16px">'+BOISSONS.map(function(b){return '<div class="between"><span class="small">'+b+'</span><b style="font-size:20px;font-variant-numeric:tabular-nums">'+t.b[b]+'</b></div>';}).join('')+'</div>'+
+ '<div class="small" style="border-top:1px solid currentColor;padding-top:8px;opacity:.95">Œufs ('+oeufsTot+') : '+OEUFS.slice(1).filter(function(o){return t.o[o];}).map(function(o){return t.o[o]+' '+o.toLowerCase();}).join(' · ')+'</div></div>'+
+ (miss.length?'<div class="alert warn"><div class="grow small"><b>Sans fiche :</b> '+miss.map(function(r){return esc(r.name);}).join(', ')+'</div></div>':'')+
+ '<button class="btn primary block" data-act="bdnew">Remplir une fiche petit-déjeuner</button>'+
+ '<div class="stack"><h2 class="sec">Demain, à cause des activités</h2>'+actsCard('cuisine')+'</div>'+
+ ids.map(function(id){var r=room(id);var f=S.bdf[id];
+  return '<div class="card" style="padding:14px 16px;display:flex;gap:14px"><span class="time">'+f.heure+'</span><div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:8px">'+
+  '<div class="between"><button class="back" style="min-height:0;color:var(--fg);font-weight:600" data-act="bdedit" data-p="'+id+'">'+esc(r.name)+'</button><span class="small muted">'+f.pers.length+' pers.'+(f.depart?' · départ '+esc(f.depart):'')+'</span></div>'+
+  '<div class="stack" style="gap:4px">'+f.pers.map(function(p,i){return '<div class="small"><span class="muted">P'+(i+1)+'</span> · '+esc(p.b||'—')+' · '+esc(p.o||'—')+'</div>';}).join('')+'</div>'+
+  (f.allerg?'<div class="small" style="padding:6px 10px;border-radius:8px;background:var(--crit-soft);color:var(--crit-ink);font-weight:600">⚠ '+esc(f.allerg)+'</div>':'')+
+  '</div></div>';}).join('');
+};
+V.bdform=function(){
+ var d=S.draft;var occ=S.rooms.filter(function(r){return r.status!=='libre';});
+ var r=room(d.room);
+ function chips(name,list,val,i){return '<div class="chips" role="radiogroup" aria-label="'+name+'">'+list.map(function(x){var on=val===x;return '<button type="button" class="chip" role="radio" aria-checked="'+on+'" data-bdset="'+i+'|'+(name==='Boisson'?'b':'o')+'|'+esc(x)+'" style="'+(on?'background:var(--accent);border-color:var(--accent);color:var(--accent-fg);font-weight:600':'')+'">'+esc(x)+'</button>';}).join('')+'</div>';}
+ return back('Petit-déjeuner','petitdej')+'<div><h1 class="display">Fiche petit-déjeuner</h1><div class="small muted" style="margin-top:4px">À remplir avec le client à l\'arrivée · valable tout le séjour</div></div>'+
+ '<div><label class="xs muted" for="bd-room">Chambre</label><select id="bd-room" data-bdroom="1" style="max-width:none;width:100%">'+occ.map(function(x){return '<option value="'+x.id+'"'+(x.id===d.room?' selected':'')+'>'+esc(x.name)+(S.bdf[x.id]?'':' · sans fiche')+'</option>';}).join('')+'</select></div>'+
+ '<div class="card" style="padding:14px 16px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px"><div style="grid-column:1/-1"><div class="xs muted">Nom</div><div class="t">'+esc(r.guest||'—')+'</div></div><div><div class="xs muted">Arrivée</div><div>'+esc(r.arr||'—')+'</div></div><div><div class="xs muted">Départ</div><div>'+esc(r.dep||'—')+'</div></div><div style="grid-column:1/-1" class="xs muted">Rempli automatiquement depuis Octorate</div></div>'+
+ '<div class="small muted" style="line-height:1.5"><b style="color:var(--fg)">Inclus chaque matin, fait maison :</b> jus d\'orange frais, yaourt maison, flan de semoule ou mhalabia, salade ou compote de fruits, viennoiseries, crêpes, mille trous ou msemen, pain frais, beurre, confiture, miel.</div>'+
+ d.pers.map(function(p,i){return '<div class="card" style="padding:14px 16px;display:flex;flex-direction:column;gap:10px"><div class="t">Personne '+(i+1)+'</div><div class="xs muted">Boisson chaude</div>'+chips('Boisson',BOISSONS,p.b,i)+'<div class="xs muted">Œufs</div>'+chips('Œufs',OEUFS,p.o,i)+'</div>';}).join('')+
+ '<div class="row"><button type="button" class="btn ghost" data-act="bdaddp">+ Ajouter une personne</button>'+(d.pers.length>1?'<button type="button" class="btn ghost" data-act="bddelp">− Retirer</button>':'')+'</div>'+
+ '<div class="card" style="padding:14px 16px;display:flex;flex-direction:column;gap:12px">'+
+ '<div><label class="xs muted" for="bd-all" style="color:var(--crit-ink);font-weight:600">⚠ Allergies alimentaires</label><input id="bd-all" data-bdf="allerg" value="'+esc(d.allerg)+'" placeholder="Aucune" style="width:100%;box-sizing:border-box;height:44px;border:1px solid var(--line);border-radius:10px;background:var(--field);padding:0 12px"></div>'+
+ '<div class="grid2"><div><label class="xs muted" for="bd-h">Heure du petit-déjeuner</label><select id="bd-h" data-bdf="heure" style="max-width:none;width:100%">'+HEURES.map(function(h){return '<option'+(h===d.heure?' selected':'')+'>'+h+'</option>';}).join('')+'</select></div><div><label class="xs muted" for="bd-dep">Heure de départ</label><input id="bd-dep" type="time" data-bdf="depart" value="'+esc(d.depart)+'" style="width:100%;box-sizing:border-box;height:44px;border:1px solid var(--line);border-radius:10px;background:var(--field);padding:0 10px"></div></div>'+
+ '<label class="check" style="padding:0"><input type="checkbox" data-bdf="menu"'+(d.menu?' checked':'')+'><span class="grow small">Recevoir le menu du lendemain sur son téléphone</span></label>'+
+ '<div><div class="xs muted" style="margin-bottom:6px">Intéressé par</div><div class="chips">'+INTERETS.map(function(x){var on=d.int.indexOf(x)>=0;return '<button type="button" class="chip" aria-pressed="'+on+'" data-bdint="'+x+'" style="'+(on?'background:var(--info-soft);border-color:var(--info-ink);color:var(--info-ink);font-weight:600':'')+'">'+x+'</button>';}).join('')+'</div></div>'+
+ '</div>'+
+ '<button class="btn primary block" data-act="bdsave">Enregistrer la fiche</button>';
+};
+/* ---------- spa en direct (Wix) ---------- */
+var LIVE={state:'idle',items:[],error:'',pin:'',tab:'today'};
+function ymd(off){return new Date(Date.now()+(off||0)*864e5).toLocaleDateString('sv-SE',{timeZone:'Europe/Paris'});}
+try{LIVE.pin=localStorage.getItem('anyssates-pin')||'';}catch(e){}
+var JOURS=['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'];
+var MOIS=['janv.','févr.','mars','avr.','mai','juin','juil.','août','sept.','oct.','nov.','déc.'];
+function dayLabel(d){var x=new Date(d+'T12:00:00');return JOURS[x.getDay()]+' '+x.getDate()+' '+MOIS[x.getMonth()];}
+function loadSpa(){
+ if(!LIVE.pin){LIVE.state='pin';render();return;}
+ LIVE.state='loading';render();
+ fetch('/api/spa',{headers:{'x-staff-pin':LIVE.pin}}).then(function(r){
+  if(r.status===401){LIVE.pin='';try{localStorage.removeItem('anyssates-pin');}catch(e){}LIVE.state='pin';LIVE.error='Code incorrect, réessayez.';render();return null;}
+  if(!r.ok)throw new Error('http');return r.json();
+ }).then(function(j){if(!j)return;LIVE.items=j.bookings||[];LIVE.state='ok';LIVE.error='';render();})
+ .catch(function(){LIVE.state='error';render();});
+}
+function liveAlerts(b){
+ var a=[];var t=b.start.slice(11,16);var n=b.name.toLowerCase();
+ if(n.indexOf('hammam')>=0)a.push({id:b.id+'h',time:fromMin(toMin(t)-90),txt:'Allumer le hammam',sub:'1h30 avant · '+b.name+' à '+t,lvl:'crit'});
+ if(n.indexOf('massage')>=0)a.push({id:b.id+'m',time:fromMin(toMin(t)-30),txt:'Allumer le matelas chauffant',sub:'30 min avant · '+b.name+' à '+t,lvl:'warn'});
+ return a;
+}
+V.spa=function(){
+ var head=back()+'<div><div class="row" style="gap:8px"><span class="pill p-info">Planning réel Wix</span></div><h1 class="display" style="margin-top:8px">Spa &amp; hammam</h1></div>';
+ if(LIVE.state==='idle'){setTimeout(loadSpa,0);return head+'<div class="card item muted">Chargement du planning…</div>';}
+ if(LIVE.state==='pin')return head+'<form class="card" data-pinform="1" style="padding:16px;display:flex;flex-direction:column;gap:10px"><label for="pin" class="t">Code équipe</label><div class="small muted">Le planning contient les noms des clients : il est protégé par le code de l\'équipe.</div><input id="pin" type="password" inputmode="numeric" autocomplete="off" style="height:48px;border:1px solid var(--line);border-radius:12px;background:var(--field);padding:0 12px;font-size:18px">'+(LIVE.error?'<div class="small" style="color:var(--crit-ink)">'+esc(LIVE.error)+'</div>':'')+'<button class="btn primary block" type="submit">Afficher le planning</button></form>';
+ if(LIVE.state==='loading')return head+'<div class="card item muted">Chargement du planning…</div>';
+ if(LIVE.state==='error')return head+'<div class="alert crit"><div class="grow small">Impossible de lire le planning Wix pour le moment.</div><button class="btn" data-act="spareload">Réessayer</button></div>';
+ var t0=ymd(0),t1=ymd(1),t6=ymd(6);
+ var TABS=[['today','Aujourd\'hui',function(d){return d===t0;}],['tomorrow','Demain',function(d){return d===t1;}],['week','7 jours',function(d){return d>=t0&&d<=t6;}],['all','14 jours',function(d){return d>=t0;}]];
+ var tabsHtml='<div role="tablist" aria-label="Période" style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));background:var(--chip);border-radius:12px;padding:4px">'+TABS.map(function(tb){var n=LIVE.items.filter(function(b){return tb[2](b.start.slice(0,10));}).length;var on=LIVE.tab===tb[0];return '<button type="button" role="tab" aria-selected="'+on+'" data-tab="'+tb[0]+'" style="min-height:44px;border:0;border-radius:9px;background:'+(on?'var(--surface)':'transparent')+';color:'+(on?'var(--fg)':'var(--chip-ink)')+';font-weight:'+(on?'600':'500')+';font-size:13px;cursor:pointer">'+tb[1]+(n?' · '+n:'')+'</button>';}).join('')+'</div>';
+ var cur=TABS.filter(function(tb){return tb[0]===LIVE.tab;})[0]||TABS[0];
+ var items=LIVE.items.filter(function(b){return cur[2](b.start.slice(0,10));});
+ var empty={today:'Aucun soin aujourd\'hui.',tomorrow:'Aucun soin demain.',week:'Aucun soin dans les 7 prochains jours.',all:'Aucun soin dans les 14 prochains jours.'}[cur[0]];
+ if(!items.length)return head+tabsHtml+'<div class="card item muted">'+empty+'</div><button class="btn ghost block" data-act="spareload">Actualiser</button>';
+ var days={};items.forEach(function(b){var d=b.start.slice(0,10);(days[d]=days[d]||[]).push(b);});
+ var multi=Object.keys(days).length>1||cur[0]==='week'||cur[0]==='all';
+ return head+tabsHtml+Object.keys(days).sort().map(function(d){
+  var list=days[d];var al=[];list.forEach(function(b){al=al.concat(liveAlerts(b));});al.sort(function(x,y){return toMin(x.time)-toMin(y.time);});
+  return '<div class="stack">'+(multi?'<h2 class="display" style="font-size:24px">'+dayLabel(d)+'</h2>':'<div class="small muted">'+dayLabel(d)+'</div>')+
+  al.map(function(a){var dn=S.spaDone[a.id];return '<div class="alert '+(dn?'':a.lvl)+'" style="'+(dn?'background:var(--surface);border:1px solid var(--line);color:var(--muted)':'')+'">'+ic(a.lvl==='crit'?'flame':'warn','currentColor')+'<div class="grow"><div class="t small">'+a.time+' · '+esc(a.txt)+'</div><div class="xs">'+esc(a.sub)+'</div></div>'+(dn?'<span class="pill p-ok">Fait · '+dn+'</span>':'<button class="btn" data-spa="'+a.id+'">Fait</button>')+'</div>';}).join('')+
+  '<div class="card list">'+list.map(function(b){return '<div class="item" style="align-items:flex-start"><div class="time">'+b.start.slice(11,16)+'<div class="xs muted" style="font-weight:400">'+b.end.slice(11,16)+'</div></div><div class="grow"><div style="font-weight:500">'+esc(b.name)+'</div><div class="row" style="margin-top:6px;flex-wrap:wrap;gap:6px"><span class="pill p-neutral">Chambre non indiquée</span><span class="small muted">'+esc(b.guest)+(b.people>1?' · '+b.people+' pers.':'')+'</span></div>'+(b.paid?'':'<div class="xs" style="margin-top:6px;color:var(--warn-ink)">Non payé · règlement sur place</div>')+(b.message?'<div class="small" style="margin-top:6px;padding:8px 10px;border-radius:10px;background:var(--warn-soft);color:var(--warn-ink)">Message : '+esc(b.message)+'</div>':'')+'</div></div>';}).join('')+'</div></div>';
+ }).join('')+'<button class="btn ghost block" data-act="spareload">Actualiser</button>';
+};
+V.cuisine=function(){
+ var low=S.stock.filter(function(s){return s.q<s.min;});
+ return back()+'<div><h1 class="display">Cuisine</h1><div class="small muted" style="margin-top:4px">Tarik · courses et stock</div></div>'+
+ '<div class="card" style="padding:14px 16px;display:flex;flex-direction:column;gap:8px"><div class="label">Prévu demain</div><div class="grid3"><div><div class="stat v" style="padding:0;font-size:24px">8</div><div class="small muted">Petits-déj</div></div><div><div class="stat v" style="padding:0;font-size:24px">2</div><div class="small muted">Déjeuners</div></div><div><div class="stat v" style="padding:0;font-size:24px">6</div><div class="small muted">Dîners</div></div></div></div>'+
+ '<div class="stack"><h2 class="sec">Alertes <span class="n">· '+(low.length+1)+'</span></h2>'+low.map(function(s){return '<div class="alert crit">'+ic('warn','currentColor')+'<div class="grow"><div class="t small">Sous le seuil · '+esc(s.n.toLowerCase())+'</div><div class="small">'+s.q+s.u+' restants, seuil à '+s.min+s.u+'</div></div></div>';}).join('')+'<div class="alert warn">'+ic('warn','currentColor')+'<div class="grow"><div class="t small">À consommer vite · yaourts</div><div class="small">10 pots, date limite dans 2 jours</div></div></div></div>'+
+ '<div class="stack"><div class="between"><h2 class="sec">Liste de courses</h2><span class="xs muted">Selon stock et réservations</span></div>'+
+ S.shop.map(function(g,gi){return '<div class="label" style="margin-top:4px">'+esc(g.g)+'</div><div class="card list">'+g.items.map(function(it,ii){return '<label class="check'+(it.done?' done':'')+'"><input type="checkbox" data-shop="'+gi+'|'+ii+'"'+(it.done?' checked':'')+'><span class="grow" style="flex:1">'+esc(it.n)+'</span><span class="small" style="font-weight:600">'+esc(it.q)+'</span></label>';}).join('')+'</div>';}).join('')+
+ (S.orderSent?'<div class="alert" style="background:var(--accent-soft);color:var(--accent-ink)">'+ic('ok','currentColor')+'<div class="grow small">Commande envoyée pour validation à la direction.</div></div>':'<button class="btn primary block" data-act="sendorder">Envoyer pour validation</button>')+'</div>'+
+ '<div class="stack"><div class="between"><h2 class="sec">Stock</h2><span class="xs muted">En stock / seuil minimum</span></div><div class="card list">'+S.stock.map(function(s){var p=Math.min(100,Math.round(s.q/s.min*100*0.7));var lw=s.q<s.min;return '<div style="padding:12px 16px;display:flex;flex-direction:column;gap:6px"><div class="between small"><span>'+esc(s.n)+'</span><span style="font-weight:600;'+(lw?'color:var(--crit-ink)':'')+'">'+s.q+' / '+s.min+s.u+'</span></div><div class="bar"><i class="'+(lw?'low':'')+'" style="width:'+(lw?Math.round(s.q/s.min*100):100)+'%"></i></div></div>';}).join('')+'</div><label class="btn ghost block" style="display:flex;align-items:center;justify-content:center;gap:8px;position:relative">'+ic('cam')+'Photo d\'un ticket ou d\'une facture<input type="file" accept="image/*" capture="environment" data-file="ticket" style="position:absolute;inset:0;opacity:0"></label></div>';
+};
+V.achats=function(){
+ var spent=S.buys.filter(function(b){return b.kind==='controle';}).reduce(function(s,b){return s+b.amount;},0)+1290;var budget=4000;
+ var val=S.buys.filter(function(b){return b.kind==='valider';});var ctl=S.buys.filter(function(b){return b.kind==='controle';});
+ function money(n){return n.toLocaleString('fr-FR')+' MAD';}
+ return back()+'<div><h1 class="display">Contrôle des achats</h1><div class="small muted" style="margin-top:4px">Semaine (démo)</div></div>'+
+ '<div class="hero"><div class="between"><span class="label">Dépensé cette semaine</span><span class="small">Budget '+money(budget)+'</span></div><div style="font-size:30px;font-weight:600;font-variant-numeric:tabular-nums">'+money(spent)+'</div><div class="bar" style="background:rgba(255,255,255,.25)"><i style="width:'+Math.round(spent/budget*100)+'%;background:var(--accent-fg)"></i></div></div>'+
+ '<div class="stack"><h2 class="sec">À valider avant achat <span class="n">· '+val.filter(function(b){return b.state==='attente';}).length+'</span></h2>'+val.map(function(b){return '<div class="card" style="padding:14px 16px;display:flex;flex-direction:column;gap:8px"><div class="between"><span class="t">'+esc(b.title)+'</span><span class="small muted">par '+esc(b.by)+'</span></div><div class="small">'+esc(b.detail)+'</div><div class="xs muted">Estimation '+money(b.amount)+'</div>'+(b.state==='attente'?'<div class="grid2"><button class="btn ghost" data-buy="'+b.id+'|question">Demander une modif</button><button class="btn primary" data-buy="'+b.id+'|ok">Valider</button></div>':stateLine(b))+'</div>';}).join('')+'</div>'+
+ '<div class="stack"><h2 class="sec">Achats à contrôler <span class="n">· '+ctl.filter(function(b){return b.state==='attente';}).length+'</span></h2>'+ctl.map(function(b){return '<div class="card" style="padding:14px 16px;display:flex;flex-direction:column;gap:10px'+(b.ticket?'':';border-color:var(--crit-ink)')+'"><div class="between"><span class="t">'+esc(b.title)+'</span><span class="t" style="font-variant-numeric:tabular-nums">'+money(b.amount)+'</span></div><div class="row" style="flex-wrap:wrap;gap:6px">'+(b.ticket?'<span class="pill p-ok">Ticket photographié</span>':'<span class="pill p-crit">Sans ticket</span>')+'</div><div class="stack" style="gap:4px;border-top:1px solid var(--line2);padding-top:10px">'+b.flags.map(function(f){return '<div class="small" style="color:var(--'+f[0]+'-ink)">'+esc(f[1])+'</div>';}).join('')+'</div>'+(b.state==='attente'?'<div class="grid2"><button class="btn ghost" data-buy="'+b.id+'|question">Demander à Tarik</button><button class="btn primary" data-buy="'+b.id+'|ok"'+(b.ticket?'':' disabled')+'>Approuver</button></div>':stateLine(b))+'</div>';}).join('')+'</div>'+
+ '<div class="card" style="padding:14px 16px"><div class="label">La règle pour chaque achat</div><ol style="margin:8px 0 0;padding-left:20px;line-height:1.7" class="small"><li>Liste validée avant d\'acheter</li><li>Photo du ticket ou de la facture</li><li>Montant saisi</li><li>Quantités reçues vérifiées, stock mis à jour</li></ol></div>';
+};
+function stateLine(b){return b.state==='ok'?'<span class="pill p-ok" style="align-self:flex-start">Validé</span>':'<span class="pill p-warn" style="align-self:flex-start">Question envoyée à Tarik</span>';}
+
+/* ---------- render & events ---------- */
+var app=document.getElementById('app');
+function render(){
+ var v=!S.role?'roles':S.view;
+ if(S.role&&!ACCESS[S.role]){S.role=null;v='roles';}
+ if(v!=='roles'&&v!=='home'&&v!=='fiche'&&!can(v)){v='home';S.view='home';}
+ if(S.role==='femme'&&v==='home'){v='mestaches';}
+ if(v==='bdform'&&!S.draft){v='petitdej';S.view='petitdej';}
+ app.innerHTML='<div class="view" style="display:flex;flex-direction:column;gap:18px">'+V[v]()+'</div>';
+}
+app.addEventListener('click',function(e){
+ var el=e.target.closest('[data-role],[data-go],[data-act],[data-bdset],[data-bdint],[data-tab],[data-day],[data-step],[data-sig],[data-done],[data-spa],[data-buy],[data-nuit],[data-mfilter]');if(!el)return;
+ if(el.dataset.mfilter){S.mfilter=S.mfilter===el.dataset.mfilter?null:el.dataset.mfilter;render();return;}
+ if(el.dataset.nuit){var nq=el.dataset.nuit.split('|');var cur0=S.nuit[nq[0]];if(cur0&&cur0.v===nq[1])delete S.nuit[nq[0]];else S.nuit[nq[0]]={v:nq[1],t:now()};render();return;}
+ if(el.dataset.role){S.role=el.dataset.role;S.view='home';try{localStorage.setItem('anyssates-role',S.role);}catch(x){}render();window.scrollTo(0,0);return;}
+ if(el.dataset.tab){LIVE.tab=el.dataset.tab;render();return;}
+ if(el.dataset.go){go(el.dataset.go,el.dataset.p);return;}
+ var a=el.dataset.act;
+ if(a==='switch'){S.role=null;try{localStorage.removeItem('anyssates-role');}catch(x){}render();return;}
+ if(a==='spareload'){loadSpa();return;}
+ if(a==='print'){window.print();return;}
+ if(a==='nuitdone'){S.nuitDone=now();toast('Nuit clôturée, la direction est prévenue');render();return;}
+ if(a==='nuitctl'){S.nuitCtl=now();toast('Contrôle enregistré');render();return;}
+ if(a==='bdnew'||a==='bdedit'){var rid=el.dataset.p||(sansFiche()[0]||S.rooms.filter(function(x){return x.status!=='libre';})[0]).id;S.draft=mkDraft(rid);go('bdform');return;}
+ if(a==='bdaddp'){S.draft.pers.push({b:'',o:''});render();return;}
+ if(a==='bddelp'){S.draft.pers.pop();render();return;}
+ if(a==='bdsave'){var d=S.draft;var miss=d.pers.some(function(p){return !p.b||!p.o;});if(miss){toast('Choisissez une boisson et les œufs pour chaque personne');return;}S.bdf[d.room]={pers:d.pers,heure:d.heure,depart:d.depart,allerg:d.allerg.trim(),menu:d.menu,int:d.int};S.draft=null;toast('Fiche enregistrée · '+room(d.room).name);go('petitdej');return;}
+ if(a==='sendplan'){toast('Planning envoyé. Chacune le retrouve demain matin.');return;}
+ if(a==='linenret'){S.linenRet=true;toast('Retour validé');render();return;}
+ if(a==='linensend'){S.linenSent=true;toast('Bon d\'envoi créé');render();return;}
+ if(a==='sendorder'){S.orderSent=true;S.buys.unshift({id:'b'+Date.now(),kind:'valider',title:'Liste de courses de Tarik',by:'Tarik',detail:S.shop.map(function(g){return g.items.filter(function(i){return !i.done;}).map(function(i){return i.n;}).join(', ');}).filter(Boolean).join(' · '),amount:520,state:'attente'});toast('Envoyé à la direction pour validation');render();return;}
+ if(a==='sendsig'){var r=room(el.dataset.p);var sig=S.signal[r.id]||{};var ks=Object.keys(sig).filter(function(k){return sig[k];});if(!ks.length&&!S.comment.trim()){toast('Choisissez un problème ou écrivez un commentaire');return;}S.issues.push({room:r.name,by:r.who||'Femme de chambre',txt:ks.concat(S.comment.trim()?[S.comment.trim()]:[]).join(', ')});S.signal[r.id]={};S.comment='';toast('Signalement envoyé à la gouvernante');render();return;}
+ if(el.dataset.day){var p=el.dataset.day.split('|');var t=S.rec.find(function(x){return x.id===p[0];});var d=+p[1];var i=t.days.indexOf(d);if(i>=0)t.days.splice(i,1);else t.days.push(d);S.plan=null;render();return;}
+ if(el.dataset.bdset){var q2=el.dataset.bdset.split('|');S.draft.pers[+q2[0]][q2[1]]=q2.slice(2).join('|');render();return;}
+ if(el.dataset.bdint){var k=el.dataset.bdint;var ix=S.draft.int.indexOf(k);if(ix>=0)S.draft.int.splice(ix,1);else S.draft.int.push(k);render();return;}
+ if(el.dataset.step){var q=el.dataset.step.split('|');var l=S.linen[+q[0]];l.send=Math.max(0,l.send+(+q[1]));render();return;}
+ if(el.dataset.sig){var s=el.dataset.sig.split('|');S.signal[s[0]]=S.signal[s[0]]||{};S.signal[s[0]][s[1]]=!S.signal[s[0]][s[1]];render();return;}
+ if(el.dataset.done){S.common.find(function(c){return c.id===el.dataset.done;}).done=now();toast('C\'est noté');render();return;}
+ if(el.dataset.spa){S.spaDone[el.dataset.spa]=now();toast('C\'est noté');render();return;}
+ if(el.dataset.buy){var b=el.dataset.buy.split('|');S.buys.find(function(x){return x.id===b[0];}).state=b[1];toast(b[1]==='ok'?'Validé':'Question envoyée à Tarik');render();return;}
+});
+app.addEventListener('change',function(e){
+ var el=e.target;
+ if(el.dataset.assign){room(el.dataset.assign).who=el.value||null;S.plan=null;render();toast('Attribution enregistrée');return;}
+ if(el.dataset.plan){S.plan.find(function(t){return t.id===el.dataset.plan;}).who=el.value;render();return;}
+ if(el.dataset.recwho){S.rec.find(function(t){return t.id===el.dataset.recwho;}).who=el.value;S.plan=null;toast('Responsable modifié');return;}
+ if(el.dataset.recrepl){S.rec.find(function(t){return t.id===el.dataset.recrepl;}).repl=el.value;S.plan=null;toast('Remplaçante modifiée');return;}
+ if(el.dataset.rest){S.rest[el.dataset.rest]=+el.value;S.plan=null;toast('Jour de repos modifié');return;}
+ if(el.dataset.me){S.param=el.value;render();return;}
+ if(el.dataset.nuitn){S.nuitN[el.dataset.nuitn]=el.value;return;}
+ if(el.dataset.bdroom){S.draft=mkDraft(el.value);render();return;}
+ if(el.dataset.bdf){var key=el.dataset.bdf;S.draft[key]=el.type==='checkbox'?el.checked:el.value;return;}
+ if(el.dataset.shop){var p=el.dataset.shop.split('|');var it=S.shop[+p[0]].items[+p[1]];it.done=el.checked;render();return;}
+ if(el.dataset.file){if(el.files&&el.files[0])toast('Photo ajoutée');return;}
+ if(el.dataset.photo){
+  var q=el.dataset.photo.split('|');var r=room(q[0]);var f=el.files&&el.files[0];
+  var done=function(url){if(q[1]==='in'){r.pin=now();r.imgIn=url;r.m='encours';toast('Photo d\'entrée enregistrée');}else{r.pout=now();r.imgOut=url;r.m='prete';r.mt=r.pout;toast(r.name+' est prête');}render();};
+  if(f){var rd=new FileReader();rd.onload=function(){done(rd.result);};rd.onerror=function(){done(null);};rd.readAsDataURL(f);}else done(null);
+ }
+});
+app.addEventListener('submit',function(e){if(e.target.dataset.teamform){e.preventDefault();var n=(document.getElementById('tm-n').value||'').trim();if(!n){toast('Indiquez le prénom');return;}var po=document.getElementById('tm-p').value;var rr=document.getElementById('tm-r').value;var men=/chambre|Gouvernante|nuit/.test(po);TEAM.push({n:n,p:po,menage:men,femme:/chambre/.test(po)});if(men)STAFF.push(n);if(/chambre/.test(po))FEMMES.push(n);if(rr)S.rest[n]=+rr;S.plan=null;toast(n+' ajouté(e) à l\'équipe');render();return;}if(e.target.dataset.pinform){e.preventDefault();var v=(document.getElementById('pin')||{}).value||'';if(!v.trim())return;LIVE.pin=v.trim();try{localStorage.setItem('anyssates-pin',LIVE.pin);}catch(x){}LIVE.error='';loadSpa();}});
+app.addEventListener('input',function(e){if(e.target.dataset.comment)S.comment=e.target.value;if(e.target.dataset.bdf&&S.draft&&e.target.type!=='checkbox')S.draft[e.target.dataset.bdf]=e.target.value;});
+render();
+})();
+</script>
+
+</body>
+</html>
