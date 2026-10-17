@@ -549,7 +549,7 @@ V.petitdej=function(){
  (miss.length?'<div class="alert warn"><div class="grow small"><b>Sans fiche :</b> '+miss.map(function(r){return esc(r.name);}).join(', ')+'</div></div>':'')+
  '<button class="btn primary block" data-act="bdnew">Remplir une fiche petit-déjeuner</button>'+
  '<div class="stack"><h2 class="sec">Demain, à cause des activités</h2>'+actsCard('cuisine')+'</div>'+
- (ids.length?'<hr aria-hidden="true" style="border:0;border-top:2px solid var(--fg);opacity:.25;margin:8px 0">':'')+
+ (ids.length?'<hr aria-hidden="true" style="border:0;border-top:3px solid var(--accent);border-radius:2px;margin:10px 0">':'')+
  ids.map(function(id){var r=room(id);var f=S.bdf[id];
   return '<div class="card" style="padding:14px 16px;display:flex;gap:14px"><span class="time">'+f.heure+'</span><div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:8px">'+
   '<div class="between"><button class="back" style="min-height:0;color:var(--fg);font-weight:600" data-act="bdedit" data-p="'+id+'">'+esc(r.name)+'</button><span class="small muted">'+f.pers.length+' pers.'+(f.depart?' · départ '+esc(f.depart):'')+'</span></div>'+
