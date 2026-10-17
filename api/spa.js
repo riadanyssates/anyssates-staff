@@ -1,14 +1,12 @@
 // Lit les réservations spa à venir dans Wix Bookings (lecture seule).
-// Protégé par le code équipe (variable STAFF_PIN). La clé Wix reste côté serveur.
+// Consultation libre pour l'équipe (pas de code). La clé Wix reste côté serveur.
 const SITE_ID = '86293635-9a43-42a1-b451-aae82a117cdb';
 const ENDPOINT = 'https://www.wixapis.com/bookings/bookings-reader/v2/extended-bookings/query';
 
 module.exports = async function handler(req, res) {
   res.setHeader('Cache-Control', 'no-store');
   const key = process.env.WIX_API_KEY;
-  const pin = process.env.STAFF_PIN;
-  if (!key || !pin) return res.status(500).json({ error: 'config' });
-  if ((req.headers['x-staff-pin'] || '') !== pin) return res.status(401).json({ error: 'pin' });
+  if (!key) return res.status(500).json({ error: 'config' });
 
   const from = new Date(); from.setUTCHours(0, 0, 0, 0);
   const to = new Date(from.getTime() + 14 * 864e5);

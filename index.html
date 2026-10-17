@@ -341,7 +341,7 @@ V.roles=function(){
  '<div class="roles">'+ROLES.map(function(r){return '<button class="role" data-role="'+r.id+'">'+ic('user')+'<span class="grow"><span class="t" style="display:block">'+esc(r.label)+(r.who!==r.label?' · '+esc(r.who):'')+'</span><span class="small muted">'+esc(r.desc)+'</span></span><span class="muted" aria-hidden="true">›</span></button>';}).join('')+'</div>';
 };
 V.home=function(){
- if(can('spa')&&LIVE.state==='idle'&&LIVE.pin)setTimeout(loadSpa,0);
+ if(can('spa')&&LIVE.state==='idle')setTimeout(loadSpa,0);
  var R=role();var al=null;if(LIVE.state==='ok'&&LIVE.items.length){var b0=LIVE.items[0];var la=liveAlerts(b0)[0];if(la)al={time:la.time,txt:la.txt,when:dayLabel(b0.start.slice(0,10))};}
  var tiles={
   equipe:['user','Équipe',TEAM.length+' personnes'],
@@ -474,7 +474,7 @@ function photoBox(r,k){
 }
 function guestOf(id){var a=S.demain.arr.filter(function(x){return x.room===id;})[0];return a?a.guest:(room(id).guest||'');}
 V.demain=function(){
- if(can('spa')&&LIVE.state==='idle'&&LIVE.pin)setTimeout(loadSpa,0);
+ if(can('spa')&&LIVE.state==='idle')setTimeout(loadSpa,0);
  if(!S.plan)buildPlan();
  var deps=S.rooms.filter(function(r){return /Jeu\. 3/.test(r.dep||'');});
  var arr=S.demain.arr;
@@ -582,7 +582,6 @@ var JOURS=['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'];
 var MOIS=['janv.','févr.','mars','avr.','mai','juin','juil.','août','sept.','oct.','nov.','déc.'];
 function dayLabel(d){var x=new Date(d+'T12:00:00');return JOURS[x.getDay()]+' '+x.getDate()+' '+MOIS[x.getMonth()];}
 function loadSpa(){
- if(!LIVE.pin){LIVE.state='pin';render();return;}
  LIVE.state='loading';render();
  fetch('/api/spa',{headers:{'x-staff-pin':LIVE.pin}}).then(function(r){
   if(r.status===401){LIVE.pin='';try{localStorage.removeItem('anyssates-pin');}catch(e){}LIVE.state='pin';LIVE.error='Code incorrect, réessayez.';render();return null;}
