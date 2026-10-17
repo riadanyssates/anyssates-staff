@@ -170,7 +170,7 @@ var ALL=['equipe','nuit','demain','bdform','chambres','menage','planning','tache
 var NOEQ=ALL.filter(function(v){return v!=='equipe';});
 var ACCESS={direction:ALL,gerant:ALL,reception:NOEQ,gouvernante:NOEQ,femme:['mestaches'],cuisine:['demain','petitdej','cuisine','bdform'],spa:['spa'],nuit:['nuit','demain','chambres']};
 var NUIT=[
- {h:'18:00',t:'Arrivée',items:[['tenue','Se mettre en tenue du jour comme sur la feuille'],['table','Dresser la table du dîner devant la piscine'],['nbdiners','Savoir combien il y a de dîners','diners'],['bougies','Allumer les bougies, la piscine et la cheminée si nécessaire'],['mep','Faire les mises en place des dîners']]},
+ {h:'18:00',t:'Arrivée',items:[['tele-bar','Vérifier la télé du bar'],['apero','Servir l\'apéro'],['table','Dresser la table du dîner devant la piscine'],['nbdiners','Savoir combien il y a de dîners','diners'],['bougies','Allumer les bougies, la piscine et la cheminée si nécessaire'],['mep','Faire les mises en place des dîners']]},
  {h:'19:00 – 22:00',t:'Bar et dîners',items:[['degivre','Dégivrer les congélateurs si nécessaire'],['cocktails','Proposer des cocktails et faire le service du dîner'],['serviettes','Serviettes chaudes, proposer thé, café ou digestif'],['bar','Bien noter les consommations dans le cahier de bar'],['jacuzzi','Fermer le jacuzzi']]},
  {h:'22:00 – 23:00',t:'Ranger la terrasse',items:[['t-cendriers','Vider les cendriers'],['t-linge','Ramasser le linge'],['t-tables','Débarrasser les tables'],['machines','Vérifier les machines, étendre le linge si nécessaire']]},
  {h:'',t:'Ranger le patio',items:[['p-table','Ramasser la table devant la piscine'],['p-cendriers','Vider les cendriers'],['p-bougies','Ramasser les bougies'],['eteindre1','Commencer à éteindre']]},
@@ -507,6 +507,7 @@ V.demain=function(){
  '<div class="stack"><h2 class="sec">À ne pas oublier</h2><div class="card" style="padding:14px 16px"><ul style="margin:0;padding-left:18px;line-height:1.6" class="small">'+S.demain.rappels.map(function(x){return '<li>'+esc(x)+'</li>';}).join('')+'</ul></div></div>'+
  '<div class="demo noprint">Démo : activités, arrivées et repas sont des exemples. En réel, ils viendront d\'Octorate et des formulaires Airtable (transferts, excursions, montgolfière…). Le spa est réel (Wix).</div>';
 };
+function nuitWho(){var m=TEAM.filter(function(x){return x.p==='Réceptionniste de nuit';});return m.map(function(x){return x.n;}).join(', ');}
 function nuitExtras(){return S.rec.filter(function(r){return r.who==='Moshnine'&&r.days.indexOf(TODAY)>=0&&!/jacuzzi/i.test(r.name);}).map(function(r){return ['rec-'+r.id,r.name+' (tâche récurrente)'];});}
 function nuitAuto(k){if(k==='diners')return S.tonight.diners.reduce(function(s,d){return s+d.pax;},0);if(k==='police')return S.tonight.arrivees;if(k==='viennoiseries')return bdTotals().pers;return '';}
 function nuitAll(){var a=[];NUIT.forEach(function(s){s.items.forEach(function(i){a.push(i);});});return a.concat(nuitExtras());}
@@ -523,7 +524,7 @@ V.nuit=function(){
  var s=nuitStats();var night=S.role==='nuit';var ex=nuitExtras();
  var left=s.total-s.done;
  return (night?'<div class="top"><span class="brand">Riad Anyssates</span><button class="back" data-act="switch">Changer de profil</button></div>':back())+
- '<div><div class="label">Réception de nuit</div><h1 class="display" style="margin-top:4px">Check-list de nuit</h1><div class="small muted" style="margin-top:4px">'+dayLabel(ymd(0))+' · Oui quand c\'est fait, Non si pas besoin</div></div>'+
+ '<div><div class="label">Réception de nuit'+(nuitWho()?' · '+esc(nuitWho()):'')+'</div><h1 class="display" style="margin-top:4px">Check-list de nuit</h1><div class="small muted" style="margin-top:4px">'+dayLabel(ymd(0))+' · Oui quand c\'est fait, Non si pas besoin</div></div>'+
  (S.nuitDone?'<div class="alert" style="background:var(--accent-soft);color:var(--accent-ink)">'+ic('ok','currentColor')+'<div class="grow small"><b>Nuit clôturée à '+S.nuitDone+'</b>'+(S.nuitCtl?' · contrôlée par la direction à '+S.nuitCtl:'')+'</div>'+(!night&&!S.nuitCtl&&can('achats')?'<button class="btn" data-act="nuitctl">Contrôlé</button>':'')+'</div>':'')+
  (!night&&s.non.length?'<div class="alert warn"><div class="grow small"><b>Cochés Non :</b> '+s.non.map(function(i){return esc(i[1]);}).join(' · ')+'</div></div>':'')+
  '<div class="card" style="padding:14px 16px;display:flex;flex-direction:column;gap:8px"><div class="between"><span class="label">Avancement</span><span class="small" style="font-weight:600">'+s.done+' / '+s.total+'</span></div><div class="bar"><i style="width:'+Math.round(s.done/s.total*100)+'%"></i></div></div>'+
