@@ -172,7 +172,7 @@ var ACCESS={direction:ALL,gerant:ALL,reception:NOEQ,gouvernante:NOEQ,femme:['mes
 var NUIT=[
  {h:'18:00',t:'Arrivée',red:true,items:[['tele-bar','Vérifier la télé du bar'],['bougies','Allumer les lanternes et les bougies'],['piscine','Allumer la piscine et les cascades, et la cheminée si nécessaire'],['apero','Être au bar, solliciter les clients et servir l\'apéro']]},
  {h:'',t:'Préparer les dîners',items:[['table','Dresser la table du dîner devant la piscine'],['nbdiners','Savoir combien il y a de dîners','diners'],['mep','Faire les mises en place des dîners']]},
- {h:'19:00 – 22:00',t:'Bar et dîners',items:[['degivre','Dégivrer les congélateurs si nécessaire'],['cocktails','Proposer des cocktails et faire le service du dîner'],['serviettes','Serviettes chaudes, proposer thé, café ou digestif'],['bar','Bien noter les consommations dans le cahier de bar'],['jacuzzi','Fermer le jacuzzi']]},
+ {h:'19:00 – 22:00',t:'Dîners et bar',items:[['cocktails','Faire le service des dîners et proposer les boissons'],['serviettes','Serviettes chaudes en fin de dîner'],['jacuzzi','Fermer le jacuzzi à 20:00 en été, ou plus tôt dès qu\'il fait nuit'],['bar','Bien noter les consommations dans le cahier de bar'],['degivre','Dégivrer les congélateurs si nécessaire']]},
  {h:'22:00 – 23:00',t:'Ranger la terrasse',items:[['t-cendriers','Vider les cendriers'],['t-linge','Ramasser le linge'],['t-tables','Débarrasser les tables'],['machines','Vérifier les machines, étendre le linge si nécessaire']]},
  {h:'',t:'Ranger le patio',items:[['p-table','Ramasser la table devant la piscine'],['p-cendriers','Vider les cendriers'],['p-bougies','Ramasser les bougies'],['eteindre1','Commencer à éteindre']]},
  {h:'Minuit',t:'Administratif',items:[['police','Fiches de police (0 s\'il n\'y en a pas)','police'],['wa-azdine','Message WhatsApp à Azdine'],['cahier-police','Cahier de police'],['consos','Rentrer les consos dans Octorate'],['caisse','Rapprochement de caisse'],['encaissements','Rentrer les encaissements'],['wa-clients','Surveiller les messages WhatsApp et répondre aux clients présents'],['factures','Envoyer les factures aux clients présents si nécessaire'],['charge','Charger la tablette, l\'iPhone et le TPE'],['dernier','Rester au bureau jusqu\'à l\'arrivée du dernier client'],['sondage','Envoyer le sondage dîner'],['lettre','Sortir la lettre d\'accueil des clients'],['cloture','Message de clôture WhatsApp dès que tous les clients sont rentrés','heure']]},
@@ -209,7 +209,7 @@ var S={
   {id:'r2',name:'Patio & fontaine',time:'8:30',cat:'communes',days:[1,2,3,4,5,6,7],who:'Fatim Zara',repl:'Leila'},
   {id:'r3',name:'Nettoyage piscine',time:'9:00',cat:'piscine',days:[1,3,5],who:'Fatim Zara',repl:''},
   {id:'r4',name:'Arrosage des plantes',time:'Nuit',cat:'communes',days:[3,7],who:'Moshnine',repl:''},
-  {id:'r5',name:'Fermeture des jacuzzis',time:'22:00',cat:'piscine',days:[1,2,3,4,5,6,7],who:'Moshnine',repl:''}
+  {id:'r5',name:'Fermeture des jacuzzis',time:'20:00',cat:'piscine',days:[1,2,3,4,5,6,7],who:'Moshnine',repl:''}
  ],
  rest:{'Fahida':1,'Fatim Zara':2,'Leila':7,'Moshnine':4},
  plan:null,
