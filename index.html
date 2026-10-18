@@ -155,6 +155,8 @@ var TEAM=[
  {n:'Moshnine',p:'Réceptionniste de nuit',menage:true}
 ];
 var STAFF=TEAM.filter(function(t){return t.menage;}).map(function(t){return t.n;});
+// toute l'équipe peut recevoir une tâche récurrente, pas seulement le ménage
+function allNames(){return TEAM.map(function(t){return t.n;});}
 var FEMMES=TEAM.filter(function(t){return t.femme;}).map(function(t){return t.n;});
 var ROLES=[
  {id:'direction',label:'Direction',who:'Valérie',desc:'Tout voir, contrôler les achats'},
@@ -422,8 +424,8 @@ V.menage=function(){
 V.planning=function(){
  if(!S.plan)buildPlan();
  var un=S.plan.filter(function(t){return !t.who;});
- var people=STAFF.filter(function(p){return S.plan.some(function(t){return t.who===p;});});
- function row(t){return '<div class="item">'+catSw(t.cat)+'<div class="grow"><div class="t" style="font-size:14px">'+(t.time?'<span class="muted" style="font-weight:500">'+t.time+' · </span>':'')+esc(t.name)+'</div>'+(t.note?'<div class="xs" style="color:var(--warn-ink)">'+esc(t.note)+'</div>':'')+'</div><label class="sr" for="pl-'+t.id+'">Attribuer '+esc(t.name)+'</label><select id="pl-'+t.id+'" data-plan="'+t.id+'"'+(t.who?'':' class="unset"')+'>'+opts(STAFF,t.who,'Choisir…')+'</select></div>';}
+ var people=allNames().filter(function(p){return S.plan.some(function(t){return t.who===p;});});
+ function row(t){return '<div class="item">'+catSw(t.cat)+'<div class="grow"><div class="t" style="font-size:14px">'+(t.time?'<span class="muted" style="font-weight:500">'+t.time+' · </span>':'')+esc(t.name)+'</div>'+(t.note?'<div class="xs" style="color:var(--warn-ink)">'+esc(t.note)+'</div>':'')+'</div><label class="sr" for="pl-'+t.id+'">Attribuer '+esc(t.name)+'</label><select id="pl-'+t.id+'" data-plan="'+t.id+'"'+(t.who?'':' class="unset"')+'>'+opts(allNames(),t.who,'Choisir…')+'</select></div>';}
  return back('Ménage','menage')+'<div><h1 class="display">Planning de demain</h1><div class="small muted" style="margin-top:4px">'+dayLabel(ymd(1))+' · construit à partir des réservations et des tâches récurrentes</div></div>'+
  '<div class="stack"><div class="between"><h2 class="sec">Activités des clients</h2><button class="back" style="min-height:0;font-size:13px" data-go="demain">Voir toute la journée ›</button></div>'+actsCard('menage')+(function(){var sp=spaTomorrow();return sp===null?'<div class="small muted">Spa : ouvrez l\'écran Spa pour charger les soins de demain depuis Wix.</div>':'<div class="small muted">Spa : '+(sp.length?sp.length+' soin'+(sp.length>1?'s':'')+' demain (Wix)':'aucun soin demain (Wix)')+'</div>';})()+'</div>'+
  '<div class="row" style="flex-wrap:wrap;gap:8px"><span class="pill p-ok">Chambres</span><span class="pill p-warn">Parties communes</span><span class="pill p-info">Piscine &amp; jacuzzis</span></div>'+
@@ -435,8 +437,8 @@ V.taches=function(){
  return back('Ménage','menage')+'<div><h1 class="display">Tâches récurrentes</h1><div class="small muted" style="margin-top:4px">Chaque tâche a ses jours et son responsable. Le jour de repos, elle passe à la remplaçante.</div></div>'+
  S.rec.map(function(r){return '<div class="card" style="padding:14px 16px;display:flex;flex-direction:column;gap:10px"><div class="row">'+catSw(r.cat)+'<div class="grow"><div class="t">'+esc(r.name)+'</div><div class="xs muted">'+esc(r.time)+'</div></div></div>'+
   '<div class="days" role="group" aria-label="Jours pour '+esc(r.name)+'">'+[1,2,3,4,5,6,7].map(function(d){var on=r.days.indexOf(d)>=0;return '<button class="day'+(on?' on':'')+'" aria-pressed="'+on+'" aria-label="'+DAYS[d]+'" data-day="'+r.id+'|'+d+'">'+D1[d]+'</button>';}).join('')+'</div>'+
-  '<div class="grid2" style="border-top:1px solid var(--line2);padding-top:10px"><div><label class="xs muted" for="rw-'+r.id+'">Responsable</label><select id="rw-'+r.id+'" data-recwho="'+r.id+'" style="width:100%;max-width:none">'+opts(STAFF,r.who)+'</select></div><div><label class="xs muted" for="rr-'+r.id+'">Remplaçante (repos)</label><select id="rr-'+r.id+'" data-recrepl="'+r.id+'" style="width:100%;max-width:none">'+opts(STAFF,r.repl,'Personne')+'</select></div></div></div>';}).join('')+
- '<div class="stack"><h2 class="sec">Jours de repos</h2><div class="card list">'+STAFF.map(function(p,i){return '<div class="item"><span class="grow t">'+esc(p)+'</span><label class="sr" for="rest-'+i+'">Jour de repos de '+esc(p)+'</label><select id="rest-'+i+'" data-rest="'+esc(p)+'">'+[1,2,3,4,5,6,7].map(function(d){return '<option value="'+d+'"'+(S.rest[p]===d?' selected':'')+'>'+DAYS[d]+'</option>';}).join('')+'</select></div>';}).join('')+'</div></div>'+
+  '<div class="grid2" style="border-top:1px solid var(--line2);padding-top:10px"><div><label class="xs muted" for="rw-'+r.id+'">Responsable</label><select id="rw-'+r.id+'" data-recwho="'+r.id+'" style="width:100%;max-width:none">'+opts(allNames(),r.who)+'</select></div><div><label class="xs muted" for="rr-'+r.id+'">Remplaçante (repos)</label><select id="rr-'+r.id+'" data-recrepl="'+r.id+'" style="width:100%;max-width:none">'+opts(allNames(),r.repl,'Personne')+'</select></div></div></div>';}).join('')+
+ '<div class="stack"><h2 class="sec">Jours de repos</h2><div class="card list">'+allNames().map(function(p,i){return '<div class="item"><span class="grow t">'+esc(p)+'</span><label class="sr" for="rest-'+i+'">Jour de repos de '+esc(p)+'</label><select id="rest-'+i+'" data-rest="'+esc(p)+'">'+[1,2,3,4,5,6,7].map(function(d){return '<option value="'+d+'"'+(S.rest[p]===d?' selected':'')+'>'+DAYS[d]+'</option>';}).join('')+'</select></div>';}).join('')+'</div></div>'+
  '<div class="alert warn small"><div class="grow"><b>Un changement pour un seul jour ?</b> Il se fait dans le planning de demain, sans toucher à la règle.</div></div>';
 };
 V.blanchisserie=function(){
@@ -489,7 +491,7 @@ V.demain=function(){
  S.demain.meals.forEach(function(m){ev.push({t:m.time,k:m.type,who:m.ext||(room(m.room).name+' · '+guestOf(m.room)),d:m.pax+' couverts'+(m.note?' · '+m.note:'')});});
  if(sp)sp.forEach(function(b){var h=b.start.slice(11,16);ev.push({t:h,k:'Spa',who:b.name,d:b.guest+(b.people>1?' · '+b.people+' pers.':'')+' · réservé sur Wix'});liveAlerts(b).forEach(function(a){ev.push({t:a.time,k:'Spa',who:a.txt,d:a.sub,alert:true});});});
  ev.sort(function(a,b){return toMin(a.t)-toMin(b.t);});
- var people=STAFF.map(function(p){return [p,S.plan.filter(function(x){return x.who===p;}).length];}).filter(function(x){return x[1];});
+ var people=allNames().map(function(p){return [p,S.plan.filter(function(x){return x.who===p;}).length];}).filter(function(x){return x[1];});
  var un=S.plan.filter(function(x){return !x.who;}).length;
  var allerg=Object.keys(S.bdf).filter(function(id){return S.bdf[id].allerg;});
  return '<div class="noprint">'+back()+'</div>'+
