@@ -494,20 +494,23 @@ V.demain=function(){
  var t=bdTotals();var miss=sansFiche();
  var sp=spaTomorrow();
  var ev=[];
- actsSorted().forEach(function(a){ev.push({t:a.time,k:a.kind,who:room(a.room).name+' · '+guestOf(a.room),d:a.detail+(a.end?' · retour vers '+a.end:'')});});
- deps.forEach(function(r){var m=((r.dep||'').match(/(\d+:\d+)/)||[])[1]||'11:00';ev.push({t:m,k:'Départ',who:r.name+' · '+r.guest,d:'Libérer la chambre, préparer la facture'});});
- arr.forEach(function(x){ev.push({t:x.time,k:'Arrivée',who:room(x.room).name+' · '+x.guest,d:x.pax+' pers. · '+x.pays+(x.note?' · '+x.note:'')});});
+ actsSorted().forEach(function(a){ev.push({g:'act',t:a.time,k:a.kind,who:room(a.room).name+' · '+guestOf(a.room),d:a.detail+(a.end?' · retour vers '+a.end:'')});});
+ deps.forEach(function(r){var m=((r.dep||'').match(/(\d+:\d+)/)||[])[1]||'11:00';ev.push({g:'dep',t:m,k:'Départ',who:r.name+' · '+r.guest,d:'Libérer la chambre, préparer la facture'});});
+ arr.forEach(function(x){ev.push({g:'arr',t:x.time,k:'Arrivée',who:room(x.room).name+' · '+x.guest,d:x.pax+' pers. · '+x.pays+(x.note?' · '+x.note:'')});});
  S.demain.meals.forEach(function(m){ev.push({t:m.time,k:m.type,who:m.ext||(room(m.room).name+' · '+guestOf(m.room)),d:m.pax+' couverts'+(m.note?' · '+m.note:'')});});
- if(sp)sp.forEach(function(b){var h=b.start.slice(11,16);ev.push({t:h,k:'Spa',who:b.name,d:b.guest+(b.people>1?' · '+b.people+' pers.':'')+' · réservé sur Wix'});liveAlerts(b).forEach(function(a){ev.push({t:a.time,k:'Spa',who:a.txt,d:a.sub,alert:true});});});
+ if(sp)sp.forEach(function(b){var h=b.start.slice(11,16);ev.push({g:'act',t:h,k:'Spa',who:b.name,d:b.guest+(b.people>1?' · '+b.people+' pers.':'')+' · réservé sur Wix'});liveAlerts(b).forEach(function(a){ev.push({g:'act',t:a.time,k:'Spa',who:a.txt,d:a.sub,alert:true});});});
  ev.sort(function(a,b){return toMin(a.t)-toMin(b.t);});
+ // les compteurs Arrivées / Départs / Activités filtrent le programme ; un second appui réaffiche tout
+ var df=S.dfilter||null;var shown=df?ev.filter(function(e){return e.g===df;}):ev;
+ function dtile(g,n,label){var on=df===g;return '<button type="button" class="stat card stbtn'+(on?' on':'')+'" data-dfilter="'+g+'" aria-pressed="'+on+'"><div class="v">'+n+'</div><div class="small muted">'+label+'</div></button>';}
  var people=allNames().map(function(p){return [p,S.plan.filter(function(x){return x.who===p;}).length];}).filter(function(x){return x[1];});
  var un=S.plan.filter(function(x){return !x.who;}).length;
  var allerg=Object.keys(S.bdf).filter(function(id){return S.bdf[id].allerg;});
  return '<div class="noprint">'+back()+'</div>'+
  '<div><div class="label">Riad Anyssates · demain</div><h1 class="display" style="margin-top:4px">'+dayLabel(ymd(1))+'</h1><div class="small muted" style="margin-top:4px">Récapitulatif pour toute l\'équipe</div></div>'+
  '<div class="grid2 noprint"><button class="btn primary" data-act="print">Imprimer / PDF</button><button class="btn ghost" data-go="planning">Planning ménage</button></div>'+
- '<div class="grid3"><div class="stat card"><div class="v">'+arr.length+'</div><div class="small muted">Arrivées</div></div><div class="stat card"><div class="v">'+deps.length+'</div><div class="small muted">Départs</div></div><div class="stat card"><div class="v">'+(S.acts.length+(sp?sp.length:0))+'</div><div class="small muted">Activités</div></div></div>'+
- '<div class="stack"><h2 class="display" style="font-size:24px">Programme de la journée</h2><div class="card list">'+ev.map(function(e){return '<div class="item" style="align-items:flex-start'+(e.alert?';background:var(--crit-soft)':'')+'"><span class="time">'+e.t+'</span><div class="grow"><div class="row" style="gap:6px;flex-wrap:wrap">'+kindPill(e.k)+'<span class="t small">'+esc(e.who)+'</span></div><div class="small muted" style="margin-top:4px">'+esc(e.d)+'</div></div></div>';}).join('')+'</div>'+
+ '<div class="grid3">'+dtile('arr',arr.length,'Arrivées')+dtile('dep',deps.length,'Départs')+dtile('act',S.acts.length+(sp?sp.length:0),'Activités')+'</div>'+
+ '<div class="stack"><h2 class="display" style="font-size:24px">Programme de la journée'+(df?' <span class="n" style="font-size:16px">· '+(df==='arr'?'arrivées':df==='dep'?'départs':'activités')+'</span>':'')+'</h2><div class="card list">'+(shown.length?'':'<div class="item muted">Rien de prévu</div>')+shown.map(function(e){return '<div class="item" style="align-items:flex-start'+(e.alert?';background:var(--crit-soft)':'')+'"><span class="time">'+e.t+'</span><div class="grow"><div class="row" style="gap:6px;flex-wrap:wrap">'+kindPill(e.k)+'<span class="t small">'+esc(e.who)+'</span></div><div class="small muted" style="margin-top:4px">'+esc(e.d)+'</div></div></div>';}).join('')+'</div>'+
  (sp===null?'<div class="small muted noprint">Les soins spa de demain s\'ajoutent ici dès que le planning Wix est chargé (écran Spa, code équipe).</div>':'')+'</div>'+
  '<div class="stack"><h2 class="sec">Arrivées</h2><div class="card list">'+arr.map(function(x){return '<div class="item"><span class="time">'+x.time+'</span><div class="grow"><div class="t">'+esc(room(x.room).name)+' · '+esc(x.guest)+'</div><div class="small muted">'+x.pax+' pers. · '+esc(x.pays)+(x.note?' · '+esc(x.note):'')+'</div></div></div>';}).join('')+'</div></div>'+
  '<div class="stack"><h2 class="sec">Départs</h2><div class="card list">'+(deps.length?deps.map(function(r){return '<div class="item"><span class="time">'+(((r.dep||'').match(/(\d+:\d+)/)||[])[1]||'')+'</span><div class="grow"><div class="t">'+esc(r.name)+' · '+esc(r.guest)+'</div><div class="small muted">'+r.pax+' pers.</div></div></div>';}).join(''):'<div class="item muted">Aucun départ</div>')+'</div><div class="small muted">Recouches : '+rec.map(function(r){return esc(r.name);}).join(', ')+'</div></div>'+
@@ -714,7 +717,8 @@ function render(){
  app.innerHTML='<div class="view" style="display:flex;flex-direction:column;gap:18px">'+V[v]()+octBanner(v)+'</div>';
 }
 app.addEventListener('click',function(e){
- var el=e.target.closest('[data-role],[data-go],[data-act],[data-bdset],[data-bdint],[data-tab],[data-day],[data-step],[data-sig],[data-done],[data-spa],[data-buy],[data-nuit],[data-mfilter],[data-mday]');if(!el)return;
+ var el=e.target.closest('[data-role],[data-go],[data-act],[data-bdset],[data-bdint],[data-tab],[data-day],[data-step],[data-sig],[data-done],[data-spa],[data-buy],[data-nuit],[data-mfilter],[data-mday],[data-dfilter]');if(!el)return;
+ if(el.dataset.dfilter){var dv=el.dataset.dfilter;S.dfilter=S.dfilter===dv?null:dv;render();return;}
  if(el.dataset.mday){S.mday=+el.dataset.mday;S.mfilter=null;render();return;}
  if(el.dataset.mfilter){var mv=el.dataset.mfilter;S.mfilter=(mv==='tout'||S.mfilter===mv)?null:mv;render();return;}
  if(el.dataset.nuit){var nq=el.dataset.nuit.split('|');var cur0=S.nuit[nq[0]];if(cur0&&cur0.v===nq[1])delete S.nuit[nq[0]];else S.nuit[nq[0]]={v:nq[1],t:now()};render();return;}
