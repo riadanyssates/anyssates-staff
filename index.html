@@ -143,7 +143,9 @@ textarea{width:100%;box-sizing:border-box;border:1px solid var(--line);border-ra
 (function(){
 var DAYS=['','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi','Dimanche'];
 var D1=['','L','M','M','J','V','S','D'];
-var TODAY=3, TOMORROW=4; // mercredi 2 / jeudi 3 décembre (démo)
+// jour de la semaine réel (1 = lundi … 7 = dimanche), pour les tâches récurrentes et les repos
+function isoDay(off){return new Date(ymd(off)+'T12:00:00').getDay()||7;}
+var TODAY=isoDay(0), TOMORROW=isoDay(1);
 var TEAM=[
  {n:'Valérie',p:'Propriétaire et gérante'},
  {n:'Nicolas',p:'Gérant sur place'},
@@ -300,7 +302,9 @@ var I={
 };
 function ic(n,col){return '<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"'+(col?' style="stroke:'+col+'"':'')+'>'+I[n]+'</svg>';}
 function back(label,to){return '<div class="top"><button class="back" data-go="'+(to||'home')+'">‹ '+esc(label||'Accueil')+'</button><span class="small muted">Démo</span></div>';}
-function statusPill(r){return r.status==='depart'?'<span class="pill p-crit">Départ</span>':r.status==='recouche'?'<span class="pill p-ok">Recouche</span>':'<span class="pill p-neutral">Libre</span>';}
+function statusPill(r){return r.status==='depart'?'<span class="pill p-crit">Départ</span>':r.status==='recouche'?'<span class="pill p-ok">Recouche</span>':r.status==='arrivee'?'<span class="pill p-info">Arrivée</span>':'<span class="pill p-neutral">Libre</span>';}
+function stLabel(r){return r.status==='depart'?'Départ':r.status==='arrivee'?'Arrivée':'Recouche';}
+function stCol(r){return r.status==='depart'?'var(--crit-ink)':r.status==='arrivee'?'var(--info-ink)':'var(--accent-ink)';}
 function mPill(r){if(r.status==='libre')return '';return r.m==='prete'?'<span class="pill p-ok">Prête'+(r.mt?' · '+r.mt:'')+'</span>':r.m==='encours'?'<span class="pill p-warn">En cours</span>':'<span class="pill p-neutral">À faire</span>';}
 function catSw(c){return '<span class="sw" style="background:'+(c==='piscine'?'var(--info-ink)':c==='communes'?'var(--warn-ink)':'var(--accent)')+'" aria-hidden="true"></span>';}
 function opts(list,sel,empty){return (empty?'<option value="">'+empty+'</option>':'')+list.map(function(n){return '<option'+(n===sel?' selected':'')+'>'+esc(n)+'</option>';}).join('');}
@@ -323,8 +327,7 @@ function linenAlerts(){
 function buildPlan(){
  var tasks=[];
  S.rec.forEach(function(r){if(r.days.indexOf(TOMORROW)<0)return;var w=r.who;if(S.rest[w]===TOMORROW)w=r.repl||'';tasks.push({id:'p'+r.id,name:r.name,time:r.time,cat:r.cat,who:w,note:r.who!==w?(w?'Remplace '+r.who+' (repos)':r.who+' en repos : à attribuer'):''});});
- S.rooms.forEach(function(r){if(r.status==='libre')return;var depT=/Jeu\. 3/.test(r.dep||'');var a=S.acts.filter(function(x){return x.room===r.id&&x.menage;})[0];tasks.push({id:'pr'+r.id,name:r.name+' · '+(depT||r.status==='depart'?'départ':'recouche'),time:'',cat:'chambre',who:r.who||'',note:a?a.menage:''});});
- S.demain.arr.forEach(function(x){var r=room(x.room);if(r.status!=='libre')return;var a=S.acts.filter(function(y){return y.room===x.room&&y.menage;})[0];tasks.push({id:'pa'+x.room,name:r.name+' · arrivée '+x.time,time:'',cat:'chambre',who:'',note:a?a.menage:'Prête avant '+x.time});});
+ (roomsFor(1)||[]).forEach(function(r){if(r.status==='libre')return;var a=S.acts.filter(function(x){return x.room===r.id&&x.menage;})[0];tasks.push({id:'pr'+r.id,name:r.name+' · '+stLabel(r).toLowerCase(),time:'',cat:'chambre',who:r.who||'',note:a?a.menage:(r.note||'')});});
  S.plan=tasks;
 }
 
@@ -332,6 +335,7 @@ function actsSorted(){return S.acts.slice().sort(function(a,b){return toMin(a.ti
 function kindPill(k){var c=/Transfert/.test(k)?'p-info':/Montgolf/.test(k)?'p-warn':/Spa|Hammam|Massage|Soin/i.test(k)?'p-crit':'p-ok';return '<span class="pill '+c+'">'+esc(k)+'</span>';}
 function actsCard(field){
  var list=actsSorted().filter(function(a){return !field||a[field];});
+ if(!list.length)return '<div class="card item muted">Aucune activité enregistrée.</div>';
  return '<div class="card list">'+list.map(function(a){var r=room(a.room);return '<div class="item" style="align-items:flex-start"><span class="time">'+a.time+'</span><div class="grow"><div class="row" style="gap:6px;flex-wrap:wrap">'+kindPill(a.kind)+'<span class="t">'+esc(r.name)+'</span><span class="small muted">'+a.pax+' pers.</span></div><div class="small muted" style="margin-top:4px">'+esc(a.detail)+(a.end?' · retour vers '+a.end:'')+'</div>'+(field&&a[field]?'<div class="small" style="margin-top:4px;font-weight:600;color:var(--warn-ink)">→ '+esc(a[field])+'</div>':'')+'</div></div>';}).join('')+'</div>';
 }
 function spaTomorrow(){if(LIVE.state!=='ok')return null;var t1=ymd(1);return LIVE.items.filter(function(b){return b.start.slice(0,10)===t1;});}
@@ -340,7 +344,7 @@ function spaTomorrow(){if(LIVE.state!=='ok')return null;var t1=ymd(1);return LIV
 var V={};
 V.roles=function(){
  return '<div class="stack" style="gap:6px"><div class="brand">Riad Anyssates</div><h1 class="display">Qui êtes-vous ?</h1><p class="muted" style="margin:0">Chaque profil ne voit que ce qui le concerne.</p></div>'+
- '<div class="demo">Version de démonstration · seul le planning Spa est réel (Wix), le reste est un exemple.</div>'+
+ '<div class="demo">Version de démonstration · le planning Spa (Wix) et les chambres (Octorate) sont réels, le reste est un exemple.</div>'+
  '<div class="roles">'+ROLES.map(function(r){return '<button class="role" data-role="'+r.id+'">'+ic('user')+'<span class="grow"><span class="t" style="display:block">'+esc(r.label)+(r.who!==r.label?' · '+esc(r.who):'')+'</span><span class="small muted">'+esc(r.desc)+'</span></span><span class="muted" aria-hidden="true">›</span></button>';}).join('')+'</div>';
 };
 V.home=function(){
@@ -363,21 +367,21 @@ V.home=function(){
  };
  var list=ACCESS[S.role].filter(function(v){return tiles[v];});
  return '<div class="top"><span class="brand">Riad Anyssates</span><button class="back" data-act="switch">Changer de profil</button></div>'+
- '<div><h1 class="display">Bonjour '+esc(R.who)+'</h1><div class="muted small" style="margin-top:6px">Démo · 3 départs · 4 recouches</div></div>'+
+ '<div><h1 class="display">Bonjour '+esc(R.who)+'</h1><div class="muted small" style="margin-top:6px">'+(OCT.state==='ok'?'Octorate':'Démo')+' · '+['depart','arrivee','recouche'].map(function(st){var n=S.rooms.filter(function(r){return r.status===st;}).length;return n+' '+stLabel({status:st}).toLowerCase()+(n>1?'s':'');}).join(' · ')+'</div></div>'+
  (al&&can('spa')?'<div class="alert crit">'+ic('flame','currentColor')+'<div class="grow small"><b>'+esc(al.when)+' · '+al.time+'</b> · '+esc(al.txt)+'</div></div>':'')+
  '<div class="grid2">'+list.map(function(v){var t=tiles[v];return '<button class="tile" data-go="'+v+'">'+ic(t[0])+'<span><span class="t" style="display:block">'+esc(t[1])+'</span><span class="sub'+(t[3]?' crit':'')+'">'+esc(t[2])+'</span></span></button>';}).join('')+'</div>'+
- '<div class="demo">Démo : seul le Spa est branché sur Wix. Les autres actions restent sur ce téléphone.</div>';
+ '<div class="demo">Démo : le Spa est branché sur Wix et les chambres sur Octorate. Les autres actions restent sur ce téléphone.</div>';
 };
 V.chambres=function(){
  var ints=Object.keys(S.bdf).filter(function(id){return S.bdf[id].int.length;});
- return back()+'<h1 class="display">Chambres</h1>'+(ints.length?'<div class="card" style="padding:14px 16px"><div class="label">À proposer par la réception</div><div class="xs muted" style="margin-top:2px">D\'après la fiche petit-déjeuner (Intéressé par)</div>'+ints.map(function(id){return '<div class="between small" style="margin-top:8px"><span class="t">'+esc(room(id).name)+'</span><span>'+S.bdf[id].int.map(function(x){return '<span class="pill p-info" style="margin-left:4px">'+x+'</span>';}).join('')+'</span></div>';}).join('')+'</div>':'')+[['libre','Libres'],['recouche','Recouches'],['depart','Départs']].map(function(g){var rs=S.rooms.filter(function(r){return r.status===g[0];});if(!rs.length)return '';return '<div class="stack"><h2 class="sec">'+g[1]+' <span class="n">· '+rs.length+'</span></h2><div class="card list">'+rs.map(function(r){return '<button class="item" style="width:100%;background:none;border:0;border-bottom:1px solid var(--line2);text-align:left;cursor:pointer;color:var(--fg)" data-go="fiche" data-p="'+r.id+'"><span class="grow"><span class="t" style="display:block">'+esc(r.name)+'</span><span class="small muted">'+esc(r.type)+' · '+(r.guest?esc(r.guest)+' · '+r.pax+' pers.':'Libre ce soir')+'</span>'+(r.notes?'<span class="small" style="display:block;margin-top:6px;padding:6px 10px;border-radius:8px;background:var(--warn-soft);color:var(--warn-ink)"><b>Notes :</b> '+esc(r.notes)+'</span>':'')+'</span>'+statusPill(r)+'</button>';}).join('')+'</div></div>';}).join('');
+ return back()+'<h1 class="display">Chambres</h1>'+(ints.length?'<div class="card" style="padding:14px 16px"><div class="label">À proposer par la réception</div><div class="xs muted" style="margin-top:2px">D\'après la fiche petit-déjeuner (Intéressé par)</div>'+ints.map(function(id){return '<div class="between small" style="margin-top:8px"><span class="t">'+esc(room(id).name)+'</span><span>'+S.bdf[id].int.map(function(x){return '<span class="pill p-info" style="margin-left:4px">'+x+'</span>';}).join('')+'</span></div>';}).join('')+'</div>':'')+[['libre','Libres'],['arrivee','Arrivées'],['recouche','Recouches'],['depart','Départs']].map(function(g){var rs=S.rooms.filter(function(r){return r.status===g[0];});if(!rs.length)return '';return '<div class="stack"><h2 class="sec">'+g[1]+' <span class="n">· '+rs.length+'</span></h2><div class="card list">'+rs.map(function(r){return '<button class="item" style="width:100%;background:none;border:0;border-bottom:1px solid var(--line2);text-align:left;cursor:pointer;color:var(--fg)" data-go="fiche" data-p="'+r.id+'"><span class="grow"><span class="t" style="display:block">'+esc(r.name)+'</span><span class="small muted">'+esc(r.type)+' · '+(r.guest?esc(r.guest)+' · '+r.pax+' pers.':'Libre ce soir')+'</span>'+(r.notes?'<span class="small" style="display:block;margin-top:6px;padding:6px 10px;border-radius:8px;background:var(--warn-soft);color:var(--warn-ink)"><b>Notes :</b> '+esc(r.notes)+'</span>':'')+'</span>'+statusPill(r)+'</button>';}).join('')+'</div></div>';}).join('');
 };
 V.fiche=function(){
  var r=room(S.param);var prog=[];
  var f=S.bdf[r.id];if(f)prog.push([f.heure,'Petit-déjeuner',f.pers.map(function(p){return p.b+(p.o&&p.o!==OEUFS[0]?' + '+p.o.toLowerCase():'');}).join(' · ')]);
  S.spa.forEach(function(s){if(s.room===r.id)prog.push([s.start,s.name,'Spa']);});
  S.acts.forEach(function(a){if(a.room===r.id)prog.push([a.time,a.kind+' · demain',a.detail]);});
- if(r.id==='S2')prog.push(['20:00','Dîner · 2 couverts','Restaurant du riad']);
+ if(r.id==='S2'&&OCT.state!=='ok')prog.push(['20:00','Dîner · 2 couverts','Restaurant du riad']);
  return back('Chambres','chambres')+
  '<div class="stack"><div class="label">'+esc(r.type)+'</div><h1 class="display" style="font-size:40px">'+esc(r.name)+'</h1><div class="row" style="flex-wrap:wrap;gap:8px">'+statusPill(r)+(r.status!=='libre'?'<span class="pill p-neutral">Ménage : '+esc(r.who||'non attribué')+'</span>'+mPill(r):'')+'</div></div>'+
  (r.guest?'<div class="card" style="padding:16px;display:flex;flex-direction:column;gap:12px"><div><div class="t" style="font-size:18px">'+esc(r.guest)+'</div><div class="small muted">'+esc(r.pays)+' · '+r.pax+' pers.</div></div><div class="grid2" style="border-top:1px solid var(--line2);padding-top:12px"><div><div class="xs muted">Arrivée</div><div>'+esc(r.arr)+'</div></div><div><div class="xs muted">Départ</div><div>'+esc(r.dep)+'</div></div></div></div>':'<div class="card item muted">Pas de client ce soir.</div>')+
@@ -387,13 +391,17 @@ V.fiche=function(){
 };
 function roomsFor(off){
  if(off===0)return S.rooms;
+ if(OCT.state==='ok'){
+  if(off<-1||off>14)return null;
+  return ROOMBASE.map(function(b){var x=roomOn(b,ymd(off));var t=room(b.id);x.who=x.status!=='libre'&&t?t.who:null;x.m='afaire';return x;});
+ }
  if(off!==1)return null;
  return S.rooms.map(function(r){
-  var x={id:r.id,name:r.name,type:r.type,status:r.status,who:r.who,m:'afaire',note:''};
+  var x={id:r.id,name:r.name,type:r.type,status:r.status,who:r.who,m:'afaire',note:'',guest:r.guest,pax:r.pax,dep:r.dep};
   var ar=S.demain.arr.filter(function(a){return a.room===r.id;})[0];
   if(/Jeu\. 3/.test(r.dep||''))x.status='depart';
   else if(r.status==='depart')x.status=/Nouveaux clients|Arrivée suivante/.test(r.notes||'')?'recouche':'libre';
-  if(x.status==='libre'){x.who=null;if(ar)x.note='À préparer · arrivée '+ar.time+' ('+ar.guest+')';}
+  if(x.status==='libre'){x.who=null;if(ar){x.status='arrivee';x.note='Prête avant '+ar.time+' ('+ar.guest+')';}}
   return x;
  });
 }
@@ -401,16 +409,16 @@ V.menage=function(){
  var off=S.mday||0;var f=S.mfilter||null;var fa=f||'tout';var rs=roomsFor(off);var today=off===0;
  var dayTabs='<div class="grid3" role="group" aria-label="Jour" style="gap:6px">'+[[0,'Aujourd\'hui'],[1,'Demain']].map(function(d){var on=off===d[0];return '<button type="button" class="day'+(on?' on':'')+'" style="height:44px" aria-pressed="'+on+'" data-mday="'+d[0]+'">'+d[1]+'</button>';}).join('')+'<label class="day'+(off>1||off<0?' on':'')+'" style="height:44px;display:flex;align-items:center;justify-content:center;position:relative;cursor:pointer">'+(off>1||off<0?esc(dayLabel(ymd(off)).split(' ').slice(1).join(' ')):'Autre date')+'<input type="date" data-mdate="1" value="'+ymd(off)+'" aria-label="Choisir une date" style="position:absolute;inset:0;opacity:0;cursor:pointer"></label></div>';
  var head=back()+'<div><h1 class="display">'+(today?'Ménage du jour':off===1?'Ménage de demain':'Ménage')+'</h1><div class="small muted" style="margin-top:4px">'+dayLabel(ymd(off))+'</div></div>'+dayTabs;
- if(!rs)return head+'<div class="card item muted" style="padding:16px">Pas de réservations pour cette date dans la démo. En réel, elles viendront d\'Octorate.</div>';
+ if(!rs)return head+'<div class="card item muted" style="padding:16px">'+(OCT.state==='ok'?'Cette date est hors des 15 jours lus dans Octorate.':'Pas de réservations pour cette date dans la démo. En réel, elles viendront d\'Octorate.')+'</div>';
  function cnt(st){return st==='tout'?rs.length:rs.filter(function(r){return r.status===st;}).length;}
  function tile(st,label,style,cls){var on=fa===st;return '<button type="button" class="stat stbtn'+(cls?' '+cls:'')+(on?' on':'')+'" style="'+style+'" data-mfilter="'+st+'" aria-pressed="'+on+'"><div class="v">'+cnt(st)+'</div><div class="small">'+label+'</div></button>';}
  var occ=rs.filter(function(r){return r.status!=='libre';});
  var shown=f?rs.filter(function(r){return r.status===f;}):rs;
- var order=shown.slice().sort(function(a,b){var o={depart:0,recouche:1,libre:2};return o[a.status]-o[b.status];});
+ var order=shown.slice().sort(function(a,b){var o={depart:0,arrivee:1,recouche:2,libre:3};return o[a.status]-o[b.status];});
  var title=f==='depart'?'Départs':f==='recouche'?'Recouches':f==='libre'?'Chambres libres':'Toutes les chambres';
  function rowOf(r){
   if(r.status==='libre')return '<div class="item"><div class="grow"><button class="back" style="min-height:0;color:var(--fg);font-weight:600" data-go="fiche" data-p="'+r.id+'">'+esc(r.name)+'</button><div class="xs" style="font-weight:600;color:'+(r.note?'var(--warn-ink)':'var(--muted)')+'">'+(r.note?esc(r.note):'Libre'+(r.type?' · '+esc(r.type):''))+'</div></div><span class="pill p-neutral">Libre</span></div>';
-  var lab='<div class="xs" style="font-weight:600;color:'+(r.status==='depart'?'var(--crit-ink)':'var(--accent-ink)')+'">'+(r.status==='depart'?'Départ':'Recouche')+'</div>';
+  var lab='<div class="xs" style="font-weight:600;color:'+stCol(r)+'">'+stLabel(r)+(r.note?' · '+esc(r.note):'')+'</div>';
   if(!today)return '<div class="item"><div class="grow"><button class="back" style="min-height:0;color:var(--fg);font-weight:600" data-go="fiche" data-p="'+r.id+'">'+esc(r.name)+'</button>'+lab+'</div><span class="pill '+(r.who?'p-neutral':'p-crit')+'">'+esc(r.who||'Non attribuée')+'</span></div>';
   return '<div class="item"><div class="grow"><button class="back" style="min-height:0;color:var(--fg);font-weight:600" data-go="fiche" data-p="'+r.id+'">'+esc(r.name)+'</button>'+lab+'</div><label class="sr" for="w-'+r.id+'">Femme de chambre pour '+esc(r.name)+'</label><select id="w-'+r.id+'" data-assign="'+r.id+'"'+(r.who?'':' class="unset"')+'>'+opts(FEMMES,r.who,'Non attribuée')+'</select>'+mPill(r)+'</div>';
  }
@@ -463,11 +471,11 @@ V.mestaches=function(){
  return (S.role==='femme'?'<div class="top"><span class="brand">Riad Anyssates</span><button class="back" data-act="switch">Changer de profil</button></div>':back())+
  (S.role!=='femme'?'<div><label class="xs muted" for="who-me">Voir la journée de</label><select id="who-me" data-me="1" style="max-width:none;width:100%">'+opts(FEMMES,me)+'</select></div>':'')+
  '<div><h1 class="display">Bonjour '+esc(me)+'</h1><div class="small muted" style="margin-top:4px">'+rooms.length+' chambres · '+common.length+' parties communes · '+rooms.filter(function(r){return r.m==='prete';}).length+' prête'+(rooms.filter(function(r){return r.m==='prete';}).length>1?'s':'')+'</div></div>'+
- (cur?'<div class="card" style="padding:16px;display:flex;flex-direction:column;gap:14px"><div><div class="label" style="color:var(--warn-ink)">'+(cur.m==='encours'?'En cours':'Suivante')+'</div><div class="display" style="font-size:30px;line-height:1.1">'+esc(cur.name)+'</div><div class="small" style="font-weight:600;color:'+(cur.status==='depart'?'var(--crit-ink)':'var(--accent-ink)')+'">'+(cur.status==='depart'?'Départ':'Recouche')+(cur.notes&&cur.status==='depart'?' · '+esc(cur.notes):'')+'</div></div>'+
+ (cur?'<div class="card" style="padding:16px;display:flex;flex-direction:column;gap:14px"><div><div class="label" style="color:var(--warn-ink)">'+(cur.m==='encours'?'En cours':'Suivante')+'</div><div class="display" style="font-size:30px;line-height:1.1">'+esc(cur.name)+'</div><div class="small" style="font-weight:600;color:'+stCol(cur)+'">'+stLabel(cur)+(cur.notes&&cur.status==='depart'?' · '+esc(cur.notes):'')+'</div></div>'+
   '<div class="grid2">'+photoBox(cur,'in')+photoBox(cur,'out')+'</div>'+
   '<div class="stack"><div class="t small">Signaler un problème</div><div class="chips">'+['Ampoule','Fuite d\'eau','Linge manquant','Objet oublié','Autre'].map(function(c){return '<button class="chip'+(sig[c]?' on':'')+'" aria-pressed="'+!!sig[c]+'" data-sig="'+cur.id+'|'+c+'">'+c+'</button>';}).join('')+'</div><label for="cm" class="small muted">Commentaire</label><textarea id="cm" rows="2" placeholder="Décrire ce qui ne va pas…" data-comment="1">'+esc(S.comment)+'</textarea><button class="btn" data-act="sendsig" data-p="'+cur.id+'">Envoyer à la gouvernante</button></div></div>':'<div class="alert" style="background:var(--accent-soft);color:var(--accent-ink)">'+ic('ok','currentColor')+'<div class="grow small">Toutes vos chambres sont prêtes.</div></div>')+
  (common.length?'<div class="stack"><h2 class="sec">Parties communes &amp; piscine</h2><div class="card list">'+common.map(function(c){return '<div class="item">'+catSw(c.cat)+'<div class="grow"><div class="t">'+esc(c.name)+'</div><div class="xs muted">'+c.time+(c.detail?' · '+esc(c.detail):'')+'</div></div>'+(c.done?'<span class="pill p-ok">Fait · '+c.done+'</span>':'<button class="btn" data-done="'+c.id+'">Fait</button>')+'</div>';}).join('')+'</div></div>':'')+
- '<div class="stack"><h2 class="sec">Mes chambres</h2><div class="card list">'+rooms.map(function(r){return '<div class="item"><div class="grow"><div class="t">'+esc(r.name)+'</div><div class="xs" style="font-weight:600;color:'+(r.status==='depart'?'var(--crit-ink)':'var(--accent-ink)')+'">'+(r.status==='depart'?'Départ':'Recouche')+'</div></div>'+mPill(r)+'</div>';}).join('')+'</div></div>';
+ '<div class="stack"><h2 class="sec">Mes chambres</h2><div class="card list">'+rooms.map(function(r){return '<div class="item"><div class="grow"><div class="t">'+esc(r.name)+'</div><div class="xs" style="font-weight:600;color:'+stCol(r)+'">'+stLabel(r)+'</div></div>'+mPill(r)+'</div>';}).join('')+'</div></div>';
 };
 function photoBox(r,k){
  var t=k==='in'?r.pin:r.pout;var img=k==='in'?r.imgIn:r.imgOut;
@@ -479,36 +487,40 @@ function guestOf(id){var a=S.demain.arr.filter(function(x){return x.room===id;})
 V.demain=function(){
  if(can('spa')&&LIVE.state==='idle')setTimeout(loadSpa,0);
  if(!S.plan)buildPlan();
- var deps=S.rooms.filter(function(r){return /Jeu\. 3/.test(r.dep||'');});
+ var tm=roomsFor(1)||[];
+ var deps=tm.filter(function(r){return r.status==='depart';});
  var arr=S.demain.arr;
- var rec=S.rooms.filter(function(r){return r.guest&&r.status!=='libre'&&!/Jeu\. 3/.test(r.dep||'')&&r.status!=='depart';});
+ var rec=tm.filter(function(r){return r.guest&&r.status==='recouche';});
  var t=bdTotals();var miss=sansFiche();
  var sp=spaTomorrow();
  var ev=[];
- actsSorted().forEach(function(a){ev.push({t:a.time,k:a.kind,who:room(a.room).name+' · '+guestOf(a.room),d:a.detail+(a.end?' · retour vers '+a.end:'')});});
- deps.forEach(function(r){var m=(r.dep.match(/(\d+:\d+)/)||[])[1]||'11:00';ev.push({t:m,k:'Départ',who:r.name+' · '+r.guest,d:'Libérer la chambre, préparer la facture'});});
- arr.forEach(function(x){ev.push({t:x.time,k:'Arrivée',who:room(x.room).name+' · '+x.guest,d:x.pax+' pers. · '+x.pays+(x.note?' · '+x.note:'')});});
+ actsSorted().forEach(function(a){ev.push({g:'act',t:a.time,k:a.kind,who:room(a.room).name+' · '+guestOf(a.room),d:a.detail+(a.end?' · retour vers '+a.end:'')});});
+ deps.forEach(function(r){var m=((r.dep||'').match(/(\d+:\d+)/)||[])[1]||'11:00';ev.push({g:'dep',t:m,k:'Départ',who:r.name+' · '+r.guest,d:'Libérer la chambre, préparer la facture'});});
+ arr.forEach(function(x){ev.push({g:'arr',t:x.time,k:'Arrivée',who:room(x.room).name+' · '+x.guest,d:x.pax+' pers. · '+x.pays+(x.note?' · '+x.note:'')});});
  S.demain.meals.forEach(function(m){ev.push({t:m.time,k:m.type,who:m.ext||(room(m.room).name+' · '+guestOf(m.room)),d:m.pax+' couverts'+(m.note?' · '+m.note:'')});});
- if(sp)sp.forEach(function(b){var h=b.start.slice(11,16);ev.push({t:h,k:'Spa',who:b.name,d:b.guest+(b.people>1?' · '+b.people+' pers.':'')+' · réservé sur Wix'});liveAlerts(b).forEach(function(a){ev.push({t:a.time,k:'Spa',who:a.txt,d:a.sub,alert:true});});});
+ if(sp)sp.forEach(function(b){var h=b.start.slice(11,16);ev.push({g:'act',t:h,k:'Spa',who:b.name,d:b.guest+(b.people>1?' · '+b.people+' pers.':'')+' · réservé sur Wix'});liveAlerts(b).forEach(function(a){ev.push({g:'act',t:a.time,k:'Spa',who:a.txt,d:a.sub,alert:true});});});
  ev.sort(function(a,b){return toMin(a.t)-toMin(b.t);});
+ // les compteurs Arrivées / Départs / Activités filtrent le programme ; un second appui réaffiche tout
+ var df=S.dfilter||null;var shown=df?ev.filter(function(e){return e.g===df;}):ev;
+ function dtile(g,n,label){var on=df===g;return '<button type="button" class="stat card stbtn'+(on?' on':'')+'" data-dfilter="'+g+'" aria-pressed="'+on+'"><div class="v">'+n+'</div><div class="small muted">'+label+'</div></button>';}
  var people=allNames().map(function(p){return [p,S.plan.filter(function(x){return x.who===p;}).length];}).filter(function(x){return x[1];});
  var un=S.plan.filter(function(x){return !x.who;}).length;
  var allerg=Object.keys(S.bdf).filter(function(id){return S.bdf[id].allerg;});
  return '<div class="noprint">'+back()+'</div>'+
  '<div><div class="label">Riad Anyssates · demain</div><h1 class="display" style="margin-top:4px">'+dayLabel(ymd(1))+'</h1><div class="small muted" style="margin-top:4px">Récapitulatif pour toute l\'équipe</div></div>'+
  '<div class="grid2 noprint"><button class="btn primary" data-act="print">Imprimer / PDF</button><button class="btn ghost" data-go="planning">Planning ménage</button></div>'+
- '<div class="grid3"><div class="stat card"><div class="v">'+arr.length+'</div><div class="small muted">Arrivées</div></div><div class="stat card"><div class="v">'+deps.length+'</div><div class="small muted">Départs</div></div><div class="stat card"><div class="v">'+(S.acts.length+(sp?sp.length:0))+'</div><div class="small muted">Activités</div></div></div>'+
- '<div class="stack"><h2 class="display" style="font-size:24px">Programme de la journée</h2><div class="card list">'+ev.map(function(e){return '<div class="item" style="align-items:flex-start'+(e.alert?';background:var(--crit-soft)':'')+'"><span class="time">'+e.t+'</span><div class="grow"><div class="row" style="gap:6px;flex-wrap:wrap">'+kindPill(e.k)+'<span class="t small">'+esc(e.who)+'</span></div><div class="small muted" style="margin-top:4px">'+esc(e.d)+'</div></div></div>';}).join('')+'</div>'+
+ '<div class="grid3">'+dtile('arr',arr.length,'Arrivées')+dtile('dep',deps.length,'Départs')+dtile('act',S.acts.length+(sp?sp.length:0),'Activités')+'</div>'+
+ '<div class="stack"><h2 class="display" style="font-size:24px">Programme de la journée'+(df?' <span class="n" style="font-size:16px">· '+(df==='arr'?'arrivées':df==='dep'?'départs':'activités')+'</span>':'')+'</h2><div class="card list">'+(shown.length?'':'<div class="item muted">Rien de prévu</div>')+shown.map(function(e){return '<div class="item" style="align-items:flex-start'+(e.alert?';background:var(--crit-soft)':'')+'"><span class="time">'+e.t+'</span><div class="grow"><div class="row" style="gap:6px;flex-wrap:wrap">'+kindPill(e.k)+'<span class="t small">'+esc(e.who)+'</span></div><div class="small muted" style="margin-top:4px">'+esc(e.d)+'</div></div></div>';}).join('')+'</div>'+
  (sp===null?'<div class="small muted noprint">Les soins spa de demain s\'ajoutent ici dès que le planning Wix est chargé (écran Spa, code équipe).</div>':'')+'</div>'+
  '<div class="stack"><h2 class="sec">Arrivées</h2><div class="card list">'+arr.map(function(x){return '<div class="item"><span class="time">'+x.time+'</span><div class="grow"><div class="t">'+esc(room(x.room).name)+' · '+esc(x.guest)+'</div><div class="small muted">'+x.pax+' pers. · '+esc(x.pays)+(x.note?' · '+esc(x.note):'')+'</div></div></div>';}).join('')+'</div></div>'+
- '<div class="stack"><h2 class="sec">Départs</h2><div class="card list">'+(deps.length?deps.map(function(r){return '<div class="item"><span class="time">'+((r.dep.match(/(\d+:\d+)/)||[])[1]||'')+'</span><div class="grow"><div class="t">'+esc(r.name)+' · '+esc(r.guest)+'</div><div class="small muted">'+r.pax+' pers.</div></div></div>';}).join(''):'<div class="item muted">Aucun départ</div>')+'</div><div class="small muted">Recouches : '+rec.map(function(r){return esc(r.name);}).join(', ')+'</div></div>'+
+ '<div class="stack"><h2 class="sec">Départs</h2><div class="card list">'+(deps.length?deps.map(function(r){return '<div class="item"><span class="time">'+(((r.dep||'').match(/(\d+:\d+)/)||[])[1]||'')+'</span><div class="grow"><div class="t">'+esc(r.name)+' · '+esc(r.guest)+'</div><div class="small muted">'+r.pax+' pers.</div></div></div>';}).join(''):'<div class="item muted">Aucun départ</div>')+'</div><div class="small muted">Recouches : '+rec.map(function(r){return esc(r.name);}).join(', ')+'</div></div>'+
  '<div class="stack"><h2 class="sec">Petit-déjeuner · '+t.pers+' personnes</h2><div class="card" style="padding:14px 16px;display:flex;flex-direction:column;gap:8px"><div class="small">'+BOISSONS.filter(function(b){return t.b[b];}).map(function(b){return t.b[b]+' '+b.toLowerCase();}).join(' · ')+'</div><div class="small">Œufs : '+OEUFS.slice(1).filter(function(o){return t.o[o];}).map(function(o){return t.o[o]+' '+o.toLowerCase();}).join(' · ')+'</div>'+
  allerg.map(function(id){return '<div class="small" style="color:var(--crit-ink);font-weight:600">⚠ '+esc(room(id).name)+' : '+esc(S.bdf[id].allerg)+'</div>';}).join('')+
  actsSorted().filter(function(a){return a.cuisine;}).map(function(a){return '<div class="small" style="color:var(--warn-ink)">'+esc(room(a.room).name)+' · '+esc(a.kind.toLowerCase())+' '+a.time+' → '+esc(a.cuisine)+'</div>';}).join('')+
  (miss.length?'<div class="small muted">Sans fiche : '+miss.map(function(r){return esc(r.name);}).join(', ')+'</div>':'')+'</div></div>'+
  '<div class="stack"><h2 class="sec">Ménage</h2><div class="card list">'+people.map(function(p){return '<div class="item"><span class="grow t">'+esc(p[0])+'</span><span class="small muted">'+p[1]+' tâche'+(p[1]>1?'s':'')+'</span></div>';}).join('')+(un?'<div class="item" style="color:var(--crit-ink)"><span class="grow t">À attribuer</span><span class="small">'+un+'</span></div>':'')+'</div></div>'+
  '<div class="stack"><h2 class="sec">À ne pas oublier</h2><div class="card" style="padding:14px 16px"><ul style="margin:0;padding-left:18px;line-height:1.6" class="small">'+S.demain.rappels.map(function(x){return '<li>'+esc(x)+'</li>';}).join('')+'</ul></div></div>'+
- '<div class="demo noprint">Démo : activités, arrivées et repas sont des exemples. En réel, ils viendront d\'Octorate et des formulaires Airtable (transferts, excursions, montgolfière…). Le spa est réel (Wix).</div>';
+ '<div class="demo noprint">'+(OCT.state==='ok'?'Arrivées et départs : Octorate. Activités et repas viendront des formulaires Airtable':'Démo : activités, arrivées et repas sont des exemples. En réel, ils viendront d\'Octorate et des formulaires Airtable')+' (transferts, excursions, montgolfière…). Le spa est réel (Wix).</div>';
 };
 function nuitWho(){var m=TEAM.filter(function(x){return x.p==='Réceptionniste de nuit';});return m.map(function(x){return x.n;}).join(', ');}
 function nuitExtras(){return S.rec.filter(function(r){return r.who==='Moshnine'&&r.days.indexOf(TODAY)>=0&&!/jacuzzi/i.test(r.name);}).map(function(r){return ['rec-'+r.id,r.name+' (tâche récurrente)'];});}
@@ -596,6 +608,53 @@ function loadSpa(){
  }).then(function(j){if(!j)return;LIVE.items=j.bookings||[];LIVE.state='ok';LIVE.error='';render();})
  .catch(function(){LIVE.state='error';render();});
 }
+/* ---------- chambres en direct (Octorate) ---------- */
+// Tant qu'Octorate ne répond pas (clé pas encore ajoutée sur Vercel), l'appli garde les chambres de démo.
+var OCT={state:'idle',stays:[],error:''};
+var ROOMBASE=S.rooms.map(function(r){return {id:r.id,name:r.name,type:r.type};});
+function fmtD(d){var x=new Date(d+'T12:00:00');return JOURS[x.getDay()].slice(0,3)+'. '+x.getDate()+(x.getDate()===1?'er':'')+' '+MOIS[x.getMonth()];}
+function staysOf(name){return OCT.stays.filter(function(s){return s.room===name||s.room==='*';});}
+// état d'une chambre pour la date d (AAAA-MM-JJ) : départ, arrivée, recouche ou libre
+function roomOn(b,d){
+ var st=staysOf(b.name);
+ var dep=st.filter(function(s){return s.dep===d;})[0];
+ var cur=st.filter(function(s){return s.arr<=d&&s.dep>d;})[0];
+ var x={id:b.id,name:b.name,type:b.type,status:'libre',notes:'',note:''};
+ if(dep)x.status='depart';else if(cur)x.status=cur.arr<d?'recouche':'arrivee';
+ var g=dep||cur;
+ if(g){x.guest=g.guest;x.pax=g.pax;x.pays=g.pays;x.arr=fmtD(g.arr);x.dep=fmtD(g.dep)+' · 11:00';if(g.children)x.notes='Dont '+g.children+' enfant'+(g.children>1?'s':'');}
+ if(cur&&cur.arr===d){
+  var h=cur.time||'14:00';x.next=cur;
+  x.note=dep?'Nouveaux clients à '+h:'Prête avant '+h;
+  if(dep)x.notes=['Nouveaux clients à '+h+' : '+cur.guest+' · '+cur.pax+' pers.',x.notes].filter(Boolean).join(' · ');
+ }
+ return x;
+}
+function applyOct(){
+ var t0=ymd(0),t1=ymd(1);
+ S.rooms=ROOMBASE.map(function(b){var x=roomOn(b,t0);var p=room(b.id);if(p&&p.live&&x.status!=='libre'){x.who=p.who;x.m=p.m;x.mt=p.mt;x.pin=p.pin;x.pout=p.pout;x.imgIn=p.imgIn;x.imgOut=p.imgOut;}else{x.who=null;x.m='afaire';}x.live=true;return x;});
+ S.demain.arr=ROOMBASE.map(function(b){return roomOn(b,t1);}).filter(function(x){return x.next;}).map(function(x){var n=x.next;return {room:x.id,guest:n.guest,pax:n.pax,pays:n.pays||'',time:n.time||'14:00',note:n.children?'Dont '+n.children+' enfant'+(n.children>1?'s':''):''};});
+ // les exemples liés aux chambres de démo n'ont plus de sens avec les vrais clients
+ if(!OCT.cleared){S.bdf={};S.acts=[];S.spa=[];S.issues=[];S.demain.meals=[];S.demain.rappels=[];S.tonight.diners=[];OCT.cleared=true;}
+ S.tonight.arrivees=S.rooms.filter(function(r){return r.status==='arrivee'||(r.status==='depart'&&r.next);}).length;
+ S.plan=null;
+}
+function loadOct(){
+ OCT.state='loading';
+ fetch('/api/octorate',{headers:{'x-staff-pin':LIVE.pin}}).then(function(r){
+  if(r.status===401){OCT.state='pin';render();return null;}
+  if(!r.ok)return r.json().catch(function(){return {};}).then(function(j){OCT.state='error';OCT.error=j.error||'http';render();return null;});
+  return r.json();
+ }).then(function(j){if(!j)return;OCT.stays=j.stays||[];OCT.state='ok';OCT.error='';applyOct();render();})
+ .catch(function(){OCT.state='error';OCT.error='fetch';render();});
+}
+var OCTVIEWS=['home','chambres','menage','planning','demain','fiche','mestaches','petitdej','nuit'];
+function octBanner(v){
+ if(OCTVIEWS.indexOf(v)<0)return '';
+ if(OCT.state==='pin')return '<form class="card" data-pinform="1" style="padding:16px;display:flex;flex-direction:column;gap:10px"><label for="pin" class="t">Code équipe</label><div class="small muted">Les chambres contiennent les noms des clients : elles sont protégées par le code de l\'équipe.</div><input id="pin" type="password" inputmode="numeric" autocomplete="off" style="height:48px;border:1px solid var(--line);border-radius:12px;background:var(--field);padding:0 12px;font-size:18px"><button class="btn primary block" type="submit">Afficher les chambres</button></form>';
+ if(OCT.state==='error'&&OCT.error!=='config')return '<div class="alert warn"><div class="grow small">Octorate ne répond pas : chambres de démonstration affichées.</div><button class="btn" data-act="octreload">Réessayer</button></div>';
+ return '';
+}
 function liveAlerts(b){
  var a=[];var t=b.start.slice(11,16);var n=b.name.toLowerCase();
  if(n.indexOf('hammam')>=0)a.push({id:b.id+'h',time:fromMin(toMin(t)-90),txt:'Allumer le hammam',sub:'1h30 avant · '+b.name+' à '+t,lvl:'crit'});
@@ -654,10 +713,12 @@ function render(){
  if(v!=='roles'&&v!=='home'&&v!=='fiche'&&!can(v)){v='home';S.view='home';}
  if(S.role==='femme'&&v==='home'){v='mestaches';}
  if(v==='bdform'&&!S.draft){v='petitdej';S.view='petitdej';}
- app.innerHTML='<div class="view" style="display:flex;flex-direction:column;gap:18px">'+V[v]()+'</div>';
+ if(S.role&&OCT.state==='idle')setTimeout(loadOct,0);
+ app.innerHTML='<div class="view" style="display:flex;flex-direction:column;gap:18px">'+V[v]()+octBanner(v)+'</div>';
 }
 app.addEventListener('click',function(e){
- var el=e.target.closest('[data-role],[data-go],[data-act],[data-bdset],[data-bdint],[data-tab],[data-day],[data-step],[data-sig],[data-done],[data-spa],[data-buy],[data-nuit],[data-mfilter],[data-mday]');if(!el)return;
+ var el=e.target.closest('[data-role],[data-go],[data-act],[data-bdset],[data-bdint],[data-tab],[data-day],[data-step],[data-sig],[data-done],[data-spa],[data-buy],[data-nuit],[data-mfilter],[data-mday],[data-dfilter]');if(!el)return;
+ if(el.dataset.dfilter){var dv=el.dataset.dfilter;S.dfilter=S.dfilter===dv?null:dv;render();return;}
  if(el.dataset.mday){S.mday=+el.dataset.mday;S.mfilter=null;render();return;}
  if(el.dataset.mfilter){var mv=el.dataset.mfilter;S.mfilter=(mv==='tout'||S.mfilter===mv)?null:mv;render();return;}
  if(el.dataset.nuit){var nq=el.dataset.nuit.split('|');var cur0=S.nuit[nq[0]];if(cur0&&cur0.v===nq[1])delete S.nuit[nq[0]];else S.nuit[nq[0]]={v:nq[1],t:now()};render();return;}
@@ -667,6 +728,7 @@ app.addEventListener('click',function(e){
  var a=el.dataset.act;
  if(a==='switch'){S.role=null;try{localStorage.removeItem('anyssates-role');}catch(x){}render();return;}
  if(a==='spareload'){loadSpa();return;}
+ if(a==='octreload'){loadOct();return;}
  if(a==='print'){window.print();return;}
  if(a==='nuitdone'){S.nuitDone=now();toast('Nuit clôturée, la direction est prévenue');render();return;}
  if(a==='nuitctl'){S.nuitCtl=now();toast('Contrôle enregistré');render();return;}
@@ -708,7 +770,7 @@ app.addEventListener('change',function(e){
   if(f){var rd=new FileReader();rd.onload=function(){done(rd.result);};rd.onerror=function(){done(null);};rd.readAsDataURL(f);}else done(null);
  }
 });
-app.addEventListener('submit',function(e){if(e.target.dataset.teamform){e.preventDefault();var n=(document.getElementById('tm-n').value||'').trim();if(!n){toast('Indiquez le prénom');return;}var po=document.getElementById('tm-p').value;var rr=document.getElementById('tm-r').value;var men=/chambre|Gouvernante|nuit/.test(po);TEAM.push({n:n,p:po,menage:men,femme:/chambre/.test(po)});if(men)STAFF.push(n);if(/chambre/.test(po))FEMMES.push(n);if(rr)S.rest[n]=+rr;S.plan=null;toast(n+' ajouté(e) à l\'équipe');render();return;}if(e.target.dataset.pinform){e.preventDefault();var v=(document.getElementById('pin')||{}).value||'';if(!v.trim())return;LIVE.pin=v.trim();try{localStorage.setItem('anyssates-pin',LIVE.pin);}catch(x){}LIVE.error='';loadSpa();}});
+app.addEventListener('submit',function(e){if(e.target.dataset.teamform){e.preventDefault();var n=(document.getElementById('tm-n').value||'').trim();if(!n){toast('Indiquez le prénom');return;}var po=document.getElementById('tm-p').value;var rr=document.getElementById('tm-r').value;var men=/chambre|Gouvernante|nuit/.test(po);TEAM.push({n:n,p:po,menage:men,femme:/chambre/.test(po)});if(men)STAFF.push(n);if(/chambre/.test(po))FEMMES.push(n);if(rr)S.rest[n]=+rr;S.plan=null;toast(n+' ajouté(e) à l\'équipe');render();return;}if(e.target.dataset.pinform){e.preventDefault();var v=(document.getElementById('pin')||{}).value||'';if(!v.trim())return;LIVE.pin=v.trim();try{localStorage.setItem('anyssates-pin',LIVE.pin);}catch(x){}LIVE.error='';if(OCT.state==='pin')loadOct();if(can('spa'))loadSpa();}});
 app.addEventListener('input',function(e){if(e.target.dataset.comment)S.comment=e.target.value;if(e.target.dataset.bdf&&S.draft&&e.target.type!=='checkbox')S.draft[e.target.dataset.bdf]=e.target.value;});
 render();
 })();
