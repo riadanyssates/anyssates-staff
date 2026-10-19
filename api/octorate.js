@@ -25,7 +25,11 @@ async function getToken() {
     headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'Accept': 'application/json' },
     body
   });
-  if (!r.ok) throw Object.assign(new Error('auth'), { status: r.status });
+  if (!r.ok) {
+    // la réponse d'Octorate (sans le secret) aide à comprendre un refus dans les logs Vercel
+    console.error('octorate auth', refresh ? 'refresh' : 'apilogin', r.status, (await r.text()).slice(0, 500));
+    throw Object.assign(new Error('auth'), { status: r.status });
+  }
   const j = await r.json();
   const exp = j.expireDate ? Date.parse(String(j.expireDate).replace(/\[.*\]$/, '')) : NaN;
   cached = { token: j.access_token, exp: isNaN(exp) ? Date.now() + 30 * 60e3 : exp };
@@ -48,7 +52,10 @@ module.exports = async function handler(req, res) {
       const q = new URLSearchParams({ startDate: from, endDate: to, type: 'STAY', size: '100', page: String(page) });
       const r = await fetch(BASE + '/reservation/' + PROPERTY + '?' + q, { headers: { 'Authorization': 'Bearer ' + token, 'Accept': 'application/json' } });
       if (r.status === 401) cached = null;
-      if (!r.ok) return res.status(502).json({ error: 'octorate', status: r.status });
+      if (!r.ok) {
+        console.error('octorate reservations', r.status, (await r.text()).slice(0, 500));
+        return res.status(502).json({ error: 'octorate', status: r.status });
+      }
       const j = await r.json();
       all.push(...(j.data || []));
       if (!j.page || page + 1 >= (j.page.totalPages || 0)) break;
@@ -74,6 +81,7 @@ module.exports = async function handler(req, res) {
       .sort((a, b) => a.arr.localeCompare(b.arr));
     return res.status(200).json({ stays, today: ymd(new Date()) });
   } catch (e) {
+    console.error('octorate', e.message, e.status || '');
     return res.status(502).json({ error: e.message === 'auth' ? 'auth' : 'fetch', status: e.status });
   }
 };
