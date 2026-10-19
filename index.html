@@ -643,7 +643,7 @@ function loadOct(){
  OCT.state='loading';
  fetch('/api/octorate',{headers:{'x-staff-pin':LIVE.pin}}).then(function(r){
   if(r.status===401){OCT.state='pin';render();return null;}
-  if(!r.ok)return r.json().catch(function(){return {};}).then(function(j){OCT.state='error';OCT.error=j.error||'http';render();return null;});
+  if(!r.ok)return r.json().catch(function(){return {};}).then(function(j){OCT.state='error';OCT.error=j.error||'http';OCT.code=j.status||r.status;render();return null;});
   return r.json();
  }).then(function(j){if(!j)return;OCT.stays=j.stays||[];OCT.state='ok';OCT.error='';applyOct();render();})
  .catch(function(){OCT.state='error';OCT.error='fetch';render();});
@@ -652,7 +652,7 @@ var OCTVIEWS=['home','chambres','menage','planning','demain','fiche','mestaches'
 function octBanner(v){
  if(OCTVIEWS.indexOf(v)<0)return '';
  if(OCT.state==='pin')return '<form class="card" data-pinform="1" style="padding:16px;display:flex;flex-direction:column;gap:10px"><label for="pin" class="t">Code équipe</label><div class="small muted">Les chambres contiennent les noms des clients : elles sont protégées par le code de l\'équipe.</div><input id="pin" type="password" inputmode="numeric" autocomplete="off" style="height:48px;border:1px solid var(--line);border-radius:12px;background:var(--field);padding:0 12px;font-size:18px"><button class="btn primary block" type="submit">Afficher les chambres</button></form>';
- if(OCT.state==='error'&&OCT.error!=='config')return '<div class="alert warn"><div class="grow small">Octorate ne répond pas : chambres de démonstration affichées.</div><button class="btn" data-act="octreload">Réessayer</button></div>';
+ if(OCT.state==='error'&&OCT.error!=='config')return '<div class="alert warn"><div class="grow small">Octorate ne répond pas : chambres de démonstration affichées.<div class="xs" style="margin-top:4px;opacity:.8">Code : '+esc(OCT.error)+(OCT.code?' '+esc(OCT.code):'')+'</div></div><button class="btn" data-act="octreload">Réessayer</button></div>';
  return '';
 }
 function liveAlerts(b){
