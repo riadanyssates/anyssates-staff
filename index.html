@@ -164,18 +164,6 @@ textarea{width:100%;box-sizing:border-box;border:1px solid var(--line);border-ra
 }
 @media (prefers-reduced-motion:no-preference){.view{animation:in .18s ease-out}@keyframes in{from{opacity:.4;transform:translateY(4px)}to{opacity:1;transform:none}}}
 /* fiche imprimable : même mise en page que les PDF Riad Anyssates */
-.sheet{background:#fff;color:#1F1B16;border-radius:4px;padding:22px 18px 16px;box-shadow:0 1px 2px rgba(0,0,0,.06),0 6px 24px rgba(0,0,0,.07);color-scheme:light}
-.sheet .pz{font-size:13px}
-.sheet .pz-top img{width:40px;height:40px}.sheet .pz-name{font-size:15px}.sheet .pz-sub{font-size:8.5px}.sheet .pz-kind{font-size:8.5px}
-.sheet .pz h1{font-size:27px;color:#1F1B16}
-.sheet .pz-meta div{font-size:8.5px}.sheet .pz-meta span{font-size:12px}
-.sheet .pz .pr-h{font-size:9.5px}.sheet .pz .pr-tw{background:none}.sheet .pz .pr-tw th{font-size:8.5px}.sheet .pz .pr-tw td{font-size:11.5px}
-.sheet .pz-foot{font-size:8px;flex-wrap:wrap;gap:4px}
-.pz .pr-ck input{pointer-events:none}
-.pz .pr-ck{cursor:default}
-@media (max-width:520px){.sheet .pz .pr-cks{columns:1}.sheet .pz-top{flex-wrap:wrap;row-gap:6px}.sheet .pz-kind{width:100%;text-align:left;padding-left:52px}.sheet .pz-kind b{display:inline;margin-right:8px}}
-.sheet .pz-name,.sheet .pz-sub{white-space:nowrap}
-.pz label:focus-within{outline:none}
 .pz{--ink:#1F1B16;--soft:#595347;--gold:#9C7A45;--cream:#FBF6EC;--pl:#E4DACA;font-family:'Inter',sans-serif;color:var(--ink);font-size:10pt;line-height:1.45}
 .pz *{box-sizing:border-box}
 .pz-top{display:flex;align-items:center;gap:12px;padding-bottom:10px;border-bottom:.8pt solid var(--gold)}
@@ -843,9 +831,11 @@ V.proc=function(){
  var f=procById(S.param);
  var to=PROC.back||'procedures';var lab=to==='procedures'?'Procédures':'Retour';
  if(!f){if(PROC.state==='idle')setTimeout(loadProc,0);return back(lab,to)+'<div class="card item muted">'+(PROC.state==='ok'?'Cette fiche n\'est pas (encore) publiée.':'Chargement de la fiche…')+'</div>';}
+ var meta=[f.type,f.postes.join(' · '),f.maj?'Mise à jour le '+frDate(f.maj):''].filter(Boolean);
  return back(lab,to)+
- (f.relecture?'<span class="pill p-warn" style="align-self:flex-start">En relecture · pas encore visible du staff</span>':'')+
- '<div class="sheet">'+sheetHtml(f)+'</div>'+
+ '<div class="stack" style="gap:8px"><div class="label">'+esc(f.cat)+'</div><h1 class="display">'+esc(f.titre)+'</h1><div class="small muted">'+esc(meta.join(' · '))+'</div>'+(f.relecture?'<span class="pill p-warn" style="align-self:flex-start">En relecture · pas encore visible du staff</span>':'')+'</div>'+
+ md(f.contenu||f.resume||'')+
+ (f.photos.length?'<div class="pr-photos">'+f.photos.map(function(p){return '<img src="'+esc(p.thumb||p.url)+'" alt="'+esc(p.name||'')+'" loading="lazy">';}).join('')+'</div>':'')+
  (f.docs.length?'<div class="stack"><h2 class="sec">Documents</h2><div class="card list">'+f.docs.map(function(d){return '<a class="item" style="color:var(--fg);text-decoration:none" href="'+esc(d.url)+'" target="_blank" rel="noopener"><span class="grow small">'+esc(d.name)+'</span><span class="muted">›</span></a>';}).join('')+'</div></div>':'')+
  '<button class="btn primary block noprint" data-act="procprint" data-p="'+esc(f.id)+'">Imprimer la fiche</button>';
 };
@@ -858,17 +848,13 @@ function procChips(v){
  if(!fs.length)return '';
  return '<div class="stack noprint"><div class="between"><h2 class="sec">Fiches utiles</h2><button class="back" style="min-height:0;font-size:13px" data-go="procedures">Toutes les fiches ›</button></div><div class="chips">'+fs.map(function(f){return '<button class="chip" data-go="proc" data-p="'+esc(f.id)+'" data-from="'+v+'">'+esc(f.titre)+(f.relecture?' ·&nbsp;relecture':'')+'</button>';}).join('')+'</div></div>';
 }
-// la fiche au format Riad Anyssates (même mise en page à l'écran, à l'impression et dans les PDF)
-function sheetHtml(f){
- return '<div class="pz"><div class="pz-top"><img src="/logo.png" alt=""><div class="pz-brand"><div class="pz-name">Riad Anyssates</div><div class="pz-sub">Marrakech · Procédures internes</div></div><div class="pz-kind"><b>'+esc(f.type)+'</b>'+esc(f.cat)+'</div></div>'+
-  '<h1>'+esc(f.titre)+'</h1><div class="pz-meta"><div>Pour<span>'+esc(f.postes.join(' · ')||'Toute l\'équipe')+'</span></div><div>Mise à jour<span>'+esc(frDate(f.maj)||'—')+'</span></div><div>Réf.<span>'+esc(f.id)+'</span></div></div>'+
-  md(f.contenu||f.resume||'')+(f.photos.length?'<div class="pr-photos" style="margin-top:12px">'+f.photos.map(function(p){return '<img src="'+esc(p.thumb||p.url)+'" alt="">';}).join('')+'</div>':'')+
-  '<div class="pz-foot"><span>Riad Anyssates — Usage interne</span><span>Réf. '+esc(f.id)+' · Mis à jour le '+esc(frDate(f.maj)||'—')+'</span></div></div>';
-}
 function printProc(id){
  var f=procById(id);if(!f)return;
  var pz=document.getElementById('printzone');
- pz.innerHTML=sheetHtml(f);
+ pz.innerHTML='<div class="pz"><div class="pz-top"><img src="/logo.png" alt=""><div class="pz-brand"><div class="pz-name">Riad Anyssates</div><div class="pz-sub">Marrakech · Procédures internes</div></div><div class="pz-kind"><b>'+esc(f.type)+'</b>'+esc(f.cat)+'</div></div>'+
+  '<h1>'+esc(f.titre)+'</h1><div class="pz-meta"><div>Pour<span>'+esc(f.postes.join(' · ')||'Toute l\'équipe')+'</span></div><div>Mise à jour<span>'+esc(frDate(f.maj)||'—')+'</span></div><div>Réf.<span>'+esc(f.id)+'</span></div></div>'+
+  md(f.contenu||f.resume||'')+(f.photos.length?'<div class="pr-photos" style="margin-top:12px">'+f.photos.map(function(p){return '<img src="'+esc(p.thumb||p.url)+'" alt="">';}).join('')+'</div>':'')+
+  '<div class="pz-foot"><span>Riad Anyssates — Usage interne</span><span>Réf. '+esc(f.id)+' · Mis à jour le '+esc(frDate(f.maj)||'—')+'</span></div></div>';
  document.body.classList.add('printing');
  var done=function(){document.body.classList.remove('printing');window.removeEventListener('afterprint',done);};
  window.addEventListener('afterprint',done);
