@@ -413,7 +413,8 @@ V.roles=function(){
 };
 V.home=function(){
  if(can('spa')&&LIVE.state==='idle')setTimeout(loadSpa,0);
- var R=role();var al=null;if(LIVE.state==='ok'&&LIVE.items.length){var b0=LIVE.items[0];var la=liveAlerts(b0)[0];if(la)al={time:la.time,txt:la.txt,when:dayLabel(b0.start.slice(0,10))};}
+ // alerte spa (allumer le hammam…) seulement pour les soins du jour, et tant qu'elle n'est pas faite
+ var R=role();var al=null;if(LIVE.state==='ok'){var t0=ymd(0);LIVE.items.filter(function(b){return b.start.slice(0,10)===t0;}).forEach(function(b){liveAlerts(b).forEach(function(la){if(!al&&!S.spaDone[la.id])al={time:la.time,txt:la.txt,when:'Aujourd\'hui'};});});}
  var tiles={
   equipe:['user','Équipe',TEAM.length+' personnes'],
   nuit:['moon','Check-list de nuit',S.nuitDone?'Clôturée à '+S.nuitDone+(S.nuitCtl?' · contrôlée':''):nuitStats().done+' / '+nuitStats().total+' faites'],
