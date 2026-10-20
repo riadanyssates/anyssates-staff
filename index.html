@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#2E5A4C">
 <title>Anyssates Staff</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=DM+Sans:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=DM+Sans:wght@400;500;600&family=Lora:wght@500;600&family=Inter:wght@400;600&display=swap">
 <style>
 :root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 body{margin:0}img{max-width:100%}[hidden]{display:none!important}
@@ -124,20 +124,83 @@ textarea{width:100%;box-sizing:border-box;border:1px solid var(--line);border-ra
 .toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--fg);color:var(--bg);padding:12px 18px;border-radius:12px;font-size:14px;font-weight:500;max-width:calc(100% - 48px);z-index:10}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 .sw{width:8px;height:8px;border-radius:999px;flex-shrink:0}
+/* procédures */
+.search{width:100%;box-sizing:border-box;height:48px;border:1px solid var(--line);border-radius:12px;background:var(--surface);padding:0 14px;font-size:16px}
+.cats{display:flex;gap:8px;overflow-x:auto;padding-bottom:2px;scrollbar-width:none}.cats::-webkit-scrollbar{display:none}
+.cats .chip{flex-shrink:0}.cats .chip.sel{background:var(--accent);border-color:var(--accent);color:var(--accent-fg)}
+.prc{display:block;width:100%;text-align:left;background:none;border:0;border-bottom:1px solid var(--line2);padding:12px 14px;cursor:pointer;color:var(--fg);font:inherit}
+.prc:last-child{border-bottom:0}
+.pr-body{display:flex;flex-direction:column;gap:14px;font-size:15px;line-height:1.5}
+.pr-body p{margin:0}
+.pr-intro{background:var(--warn-soft);color:var(--fg);border-radius:12px;padding:12px 14px}
+.pr-h{font-size:12px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--accent-ink);margin:6px 0 -6px}
+.pr-body ul{margin:0;padding-left:20px}.pr-body li{margin:3px 0}
+.pr-ol{list-style:none;margin:0;padding:0;counter-reset:s;display:flex;flex-direction:column;gap:10px}
+.pr-ol li{counter-increment:s;position:relative;padding-left:38px;min-height:28px}
+.pr-ol li::before{content:counter(s);position:absolute;left:0;top:-2px;width:26px;height:26px;border-radius:50%;border:1.5px solid var(--accent);color:var(--accent-ink);font-family:var(--display);font-weight:600;font-size:15px;display:flex;align-items:center;justify-content:center}
+.pr-cks{background:var(--surface);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.pr-ck{display:flex;align-items:center;gap:12px;padding:10px 14px;min-height:44px;box-sizing:border-box;border-bottom:1px solid var(--line2);cursor:pointer}
+.pr-ck:last-child{border-bottom:0}.pr-ck input{width:22px;height:22px;margin:0;accent-color:var(--accent);flex-shrink:0}
+.pr-ck input:checked+span{text-decoration:line-through;color:var(--muted)}
+.pr-tw{overflow-x:auto;background:var(--surface);border:1px solid var(--line);border-radius:14px}
+.pr-tw table{border-collapse:collapse;width:100%;font-size:13px}
+.pr-tw th{text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);padding:8px 10px;border-bottom:1px solid var(--line)}
+.pr-tw td{padding:8px 10px;border-bottom:1px solid var(--line2);vertical-align:top}
+.pr-tw tr:last-child td{border-bottom:0}
+.pr-vig{background:var(--crit-soft);color:var(--crit-ink);border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:6px}
+.pr-vig p{color:var(--fg)}
+.pr-photos{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.pr-photos img{width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:12px;display:block}
+#printzone{display:none}
 @page{margin:14mm}
 @media print{
+  body.printing #app{display:none!important}
+  body.printing #printzone{display:block}
+  body.printing{padding:0;background:#fff}
   :root,:root[data-theme="dark"]{--bg:#fff;--surface:#fff;--line:#ccc;--line2:#ddd;--fg:#000;--muted:#444;--chip:#eee;--chip-ink:#222;--accent:#2E5A4C;--accent-fg:#fff;--accent-soft:#E3ECE7;--accent-ink:#1F4036;--warn-soft:#F4E9D8;--warn-ink:#6E4815;--crit-soft:#F5E3DC;--crit-ink:#8A3624;--info-soft:#E2EBF1;--info-ink:#234A66}
   body{padding:0;font-size:12px}#app{max-width:none;padding:0;gap:10px}.noprint,.toast{display:none!important}
   .card,.item{break-inside:avoid}.item{min-height:0;padding:6px 10px}h1.display{font-size:26px}.view{animation:none!important}
   *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
 }
 @media (prefers-reduced-motion:no-preference){.view{animation:in .18s ease-out}@keyframes in{from{opacity:.4;transform:translateY(4px)}to{opacity:1;transform:none}}}
+/* fiche imprimable : même mise en page que les PDF Riad Anyssates */
+.pz{--ink:#1F1B16;--soft:#595347;--gold:#9C7A45;--cream:#FBF6EC;--pl:#E4DACA;font-family:'Inter',sans-serif;color:var(--ink);font-size:10pt;line-height:1.45}
+.pz *{box-sizing:border-box}
+.pz-top{display:flex;align-items:center;gap:12px;padding-bottom:10px;border-bottom:.8pt solid var(--gold)}
+.pz-top img{width:46px;height:46px}
+.pz-brand{flex:1}.pz-name{font-family:'Lora',serif;font-size:15pt;letter-spacing:.14em;text-transform:uppercase}
+.pz-sub{font-size:7.5pt;letter-spacing:.22em;text-transform:uppercase;color:var(--gold)}
+.pz-kind{text-align:right;font-size:7.5pt;letter-spacing:.18em;text-transform:uppercase;color:var(--soft)}
+.pz-kind b{display:block;color:var(--gold);font-weight:600}
+.pz h1{font-family:'Lora',serif;font-weight:500;font-size:24pt;line-height:1.15;margin:14px 0 6px}
+.pz-meta{display:flex;flex-wrap:wrap;gap:6px 28px;padding:8px 0 12px;margin-bottom:14px;border-bottom:.5pt solid var(--pl)}
+.pz-meta div{font-size:7pt;letter-spacing:.16em;text-transform:uppercase;color:var(--gold)}
+.pz-meta span{display:block;font-size:9pt;letter-spacing:0;text-transform:none;color:var(--ink);margin-top:2px}
+.pz .pr-body{font-size:10pt;gap:8px}
+.pz .pr-vig,.pz .pr-tw,.pz .pr-ol li{break-inside:avoid}
+.pz .pr-intro{background:var(--cream);border-radius:2px;padding:10px 14px}
+.pz .pr-h{font-size:7.5pt;letter-spacing:.2em;color:var(--gold);padding-bottom:4px;border-bottom:.5pt solid var(--pl);margin:6px 0 0}
+.pz .pr-cks{border:0;border-radius:0;columns:2;column-gap:26px;background:none}
+.pz .pr-ck{border:0;min-height:0;padding:1px 0;line-height:1.35;gap:9px;break-inside:avoid}
+.pz .pr-ck input{appearance:none;-webkit-appearance:none;width:9px;height:9px;border:.8pt solid var(--soft);border-radius:1.5px}
+.pz .pr-ck input:checked+span{text-decoration:none;color:inherit}
+.pz .pr-ol li::before{border-color:var(--gold);color:var(--gold);width:20px;height:20px;font-family:'Lora',serif;font-size:9pt}
+.pz .pr-ol li{padding-left:30px}
+.pz .pr-tw{border:0;border-radius:0}
+.pz .pr-tw th{border-bottom:.8pt solid var(--gold);font-size:7pt}
+.pz .pr-tw td{border-bottom:.5pt solid var(--pl);font-size:8.8pt;padding:4px 8px}
+.pz .pr-vig{background:var(--cream);color:var(--ink);border-radius:0;border-left:2pt solid var(--gold)}
+.pz .pr-vig .pr-h{display:none}
+.pz .pr-photos{grid-template-columns:repeat(3,1fr)}
+.pz .pr-photos img{border-radius:2px}
+.pz-foot{margin-top:18px;display:flex;justify-content:space-between;font-size:6.5pt;letter-spacing:.12em;text-transform:uppercase;color:#8a8275;border-top:.5pt solid #E4DACA;padding-top:4px;background:#fff}
 </style>
 </head>
 <body>
 
 <div id="app" aria-live="polite"></div>
 <div id="toast" class="toast" role="status" hidden></div>
+<div id="printzone" aria-hidden="true"></div>
 
 <script>
 (function(){
@@ -170,9 +233,9 @@ var ROLES=[
  {id:'spa',label:'Spa',who:'Spa',desc:'Planning des soins et alertes'},
  {id:'nuit',label:'Réception de nuit',who:'Moshnine',desc:'Check-list de la nuit'}
 ];
-var ALL=['equipe','nuit','demain','bdform','chambres','menage','planning','taches','blanchisserie','mestaches','spa','petitdej','cuisine','achats'];
+var ALL=['equipe','nuit','demain','bdform','chambres','menage','planning','taches','blanchisserie','mestaches','spa','petitdej','cuisine','achats','procedures'];
 var NOEQ=ALL.filter(function(v){return v!=='equipe';});
-var ACCESS={direction:ALL,gerant:ALL,reception:NOEQ,gouvernante:NOEQ,femme:['mestaches'],cuisine:['demain','petitdej','cuisine','bdform'],spa:['spa'],nuit:['nuit','demain','chambres']};
+var ACCESS={direction:ALL,gerant:ALL,reception:NOEQ,gouvernante:NOEQ,femme:['mestaches','procedures'],cuisine:['demain','petitdej','cuisine','bdform','procedures'],spa:['spa','procedures'],nuit:['nuit','demain','chambres','procedures']};
 var NUIT=[
  {h:'18:00',t:'Arrivée',red:true,items:[['tele-bar','Vérifier la télé du bar'],['bougies','Allumer les lanternes et les bougies'],['piscine','Allumer la piscine et les cascades, et la cheminée si nécessaire'],['apero','Être au bar, solliciter les clients et servir l\'apéro']]},
  {h:'',t:'Préparer les dîners',items:[['table','Dresser la table du dîner devant la piscine'],['nbdiners','Savoir combien il y a de dîners','diners'],['mep','Faire les mises en place des dîners']]},
@@ -298,7 +361,8 @@ var I={
  warn:'<path d="M12 9v4"/><path d="M12 17h.01"/><path d="M10.3 3.9L1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/>',
  ok:'<path d="M20 6L9 17l-5-5"/>',
  moon:'<path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/>',
- user:'<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>'
+ user:'<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>',
+ book:'<path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><path d="M9 7h7M9 11h5"/>'
 };
 function ic(n,col){return '<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"'+(col?' style="stroke:'+col+'"':'')+'>'+I[n]+'</svg>';}
 function back(label,to){return '<div class="top"><button class="back" data-go="'+(to||'home')+'">‹ '+esc(label||'Accueil')+'</button><span class="small muted">Démo</span></div>';}
@@ -363,7 +427,8 @@ V.home=function(){
   spa:['flame','Spa',LIVE.state==='ok'?LIVE.items.length+' soin'+(LIVE.items.length>1?'s':'')+' à venir':'Planning réel Wix'],
   petitdej:['cup','Petit-déjeuner',bdTotals().pers+' personnes'+(sansFiche().length?' · '+sansFiche().length+' sans fiche':''),sansFiche().length>0],
   cuisine:['fork','Cuisine',S.stock.filter(function(s){return s.q<s.min;}).length+' produits à commander',true],
-  achats:['receipt','Contrôle des achats',S.buys.filter(function(b){return b.state==='attente';}).length+' à vérifier',true]
+  achats:['receipt','Contrôle des achats',S.buys.filter(function(b){return b.state==='attente';}).length+' à vérifier',true],
+  procedures:['book','Procédures',PROC.state==='ok'?PROC.items.length+' fiche'+(PROC.items.length>1?'s':''):'Modes d\'emploi et pense-bêtes']
  };
  var list=ACCESS[S.role].filter(function(v){return tiles[v];});
  return '<div class="top"><span class="brand">Riad Anyssates</span><button class="back" data-act="switch">Changer de profil</button></div>'+
@@ -703,6 +768,101 @@ V.achats=function(){
  '<div class="stack"><h2 class="sec">Achats à contrôler <span class="n">· '+ctl.filter(function(b){return b.state==='attente';}).length+'</span></h2>'+ctl.map(function(b){return '<div class="card" style="padding:14px 16px;display:flex;flex-direction:column;gap:10px'+(b.ticket?'':';border-color:var(--crit-ink)')+'"><div class="between"><span class="t">'+esc(b.title)+'</span><span class="t" style="font-variant-numeric:tabular-nums">'+money(b.amount)+'</span></div><div class="row" style="flex-wrap:wrap;gap:6px">'+(b.ticket?'<span class="pill p-ok">Ticket photographié</span>':'<span class="pill p-crit">Sans ticket</span>')+'</div><div class="stack" style="gap:4px;border-top:1px solid var(--line2);padding-top:10px">'+b.flags.map(function(f){return '<div class="small" style="color:var(--'+f[0]+'-ink)">'+esc(f[1])+'</div>';}).join('')+'</div>'+(b.state==='attente'?'<div class="grid2"><button class="btn ghost" data-buy="'+b.id+'|question">Demander à Tarik</button><button class="btn primary" data-buy="'+b.id+'|ok"'+(b.ticket?'':' disabled')+'>Approuver</button></div>':stateLine(b))+'</div>';}).join('')+'</div>'+
  '<div class="card" style="padding:14px 16px"><div class="label">La règle pour chaque achat</div><ol style="margin:8px 0 0;padding-left:20px;line-height:1.7" class="small"><li>Liste validée avant d\'acheter</li><li>Photo du ticket ou de la facture</li><li>Montant saisi</li><li>Quantités reçues vérifiées, stock mis à jour</li></ol></div>';
 };
+/* ---------- procédures (Airtable, lecture seule) ---------- */
+var PROC={state:'idle',items:[],preview:false,q:'',cat:null,back:null};
+var PCATS=['Chambres & ménage','Linge & laverie','Spa & hammam','Piscine & jacuzzi','Cuisine & petits-déjeuners','Bar & boissons','Réception & administratif','Technique & entretien','Sécurité'];
+// écran de l'appli -> valeur de la colonne « Écrans de l'appli » dans Airtable
+var ECRANS={menage:'Ménage',mestaches:'Mes tâches',chambres:'Chambres',fiche:'Chambres',blanchisserie:'Blanchisserie',petitdej:'Petit-déjeuner',bdform:'Petit-déjeuner',cuisine:'Cuisine',spa:'Spa',nuit:'Nuit',demain:'Demain'};
+function loadProc(){
+ PROC.state='loading';
+ fetch('/api/procedures').then(function(r){if(!r.ok)throw new Error('http');return r.json();})
+ .then(function(j){PROC.items=j.fiches||[];PROC.preview=!!j.preview;PROC.state='ok';render();})
+ .catch(function(){PROC.state='error';render();});
+}
+function procById(id){return PROC.items.filter(function(f){return f.id===id;})[0];}
+function frDate(d){if(!d)return '';var p=d.split('-');return p[2]+'/'+p[1]+'/'+p[0];}
+function catOrder(c){var i=PCATS.indexOf(c);return i<0?99:i;}
+// Markdown simple (titres, listes, cases à cocher, étapes, tableaux, encadrés) -> HTML
+function mdInline(t){return esc(t).replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>').replace(/(^|[\s(])[_*]([^_*]+?)[_*](?=[\s).,;:!?]|$)/g,'$1<em>$2</em>');}
+function md(src){
+ var L=String(src||'').replace(/\r/g,'').split('\n'),out=[],i=0,n=0;
+ function take(re){var a=[];while(i<L.length&&re.test(L[i])){a.push(L[i]);i++;}return a;}
+ while(i<L.length){
+  var l=L[i];
+  if(!l.trim()){i++;continue;}
+  var h=l.match(/^#{1,4}\s+(.*)/);if(h){out.push('<h2 class="pr-h">'+mdInline(h[1])+'</h2>');i++;continue;}
+  if(/^\s*>/.test(l)){var q=take(/^\s*>/).map(function(x){return x.replace(/^\s*>\s?/,'');}).join('\n').split(/\n\s*\n/).filter(function(x){return x.trim();});out.push('<div class="pr-vig">'+q.map(function(p){return '<p>'+mdInline(p.trim())+'</p>';}).join('')+'</div>');continue;}
+  if(/^\s*\|/.test(l)){var rows=take(/^\s*\|/).filter(function(x){return !/^\s*\|?\s*:?-{2,}/.test(x);}).map(function(x){return x.trim().replace(/^\||\|$/g,'').split('|').map(function(c){return c.trim();});});
+   out.push('<div class="pr-tw"><table><thead><tr>'+rows[0].map(function(c){return '<th>'+mdInline(c)+'</th>';}).join('')+'</tr></thead><tbody>'+rows.slice(1).map(function(r){return '<tr>'+r.map(function(c){return '<td>'+mdInline(c)+'</td>';}).join('')+'</tr>';}).join('')+'</tbody></table></div>');continue;}
+  if(/^\s*[-*]\s+\[[ xX]\]/.test(l)){out.push('<div class="pr-cks">'+take(/^\s*[-*]\s+\[[ xX]\]/).map(function(x){n++;return '<label class="pr-ck"><input type="checkbox" aria-label="Fait"><span>'+mdInline(x.replace(/^\s*[-*]\s+\[[ xX]\]\s*/,''))+'</span></label>';}).join('')+'</div>');continue;}
+  if(/^\s*[-*]\s+/.test(l)){out.push('<ul>'+take(/^\s*[-*]\s+/).map(function(x){return '<li>'+mdInline(x.replace(/^\s*[-*]\s+/,''))+'</li>';}).join('')+'</ul>');continue;}
+  if(/^\s*\d+[.)]\s+/.test(l)){out.push('<ol class="pr-ol">'+take(/^\s*\d+[.)]\s+/).map(function(x){return '<li>'+mdInline(x.replace(/^\s*\d+[.)]\s+/,''))+'</li>';}).join('')+'</ol>');continue;}
+  var p=[];while(i<L.length&&L[i].trim()&&!/^(#{1,4}\s|\s*>|\s*\||\s*[-*]\s+|\s*\d+[.)]\s+)/.test(L[i])){p.push(L[i]);i++;}
+  if(!p.length){p.push(l);i++;}
+  out.push('<p'+(!out.length&&/^\*\*Objectif/.test(p[0])?' class="pr-intro"':'')+'>'+mdInline(p.join(' '))+'</p>');
+ }
+ return '<div class="pr-body">'+out.join('')+'</div>';
+}
+function procMatch(f){
+ if(PROC.cat&&f.cat!==PROC.cat)return false;
+ var q=PROC.q.trim().toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'');if(!q)return true;
+ var hay=[f.titre,f.resume,f.mots,f.cat,f.type,f.equip,f.postes.join(' '),f.contenu].join(' ').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'');
+ return q.split(/\s+/).every(function(w){return hay.indexOf(w)>=0;});
+}
+function procRow(f){return '<button class="prc" data-go="proc" data-p="'+esc(f.id)+'"><span class="between"><span class="t">'+esc(f.titre)+'</span>'+(f.relecture?'<span class="pill p-warn">En relecture</span>':'<span class="pill p-neutral">'+esc(f.type)+'</span>')+'</span>'+(f.resume?'<span class="small muted" style="display:block;margin-top:3px">'+esc(f.resume)+'</span>':'')+'</button>';}
+function procList(){
+ var it=PROC.items.filter(procMatch);
+ if(!it.length)return '<div class="card item muted">Aucune fiche'+(PROC.q?' pour « '+esc(PROC.q)+' »':'')+'.</div>';
+ var g={};it.forEach(function(f){(g[f.cat]=g[f.cat]||[]).push(f);});
+ return Object.keys(g).sort(function(a,b){return catOrder(a)-catOrder(b);}).map(function(c){return '<div class="stack"><h2 class="sec">'+esc(c)+' <span class="n">· '+g[c].length+'</span></h2><div class="card">'+g[c].map(procRow).join('')+'</div></div>';}).join('');
+}
+V.procedures=function(){
+ var head=back()+'<div><h1 class="display">Procédures</h1><div class="small muted" style="margin-top:4px">Modes d\'emploi, recettes et pense-bêtes du riad</div></div>';
+ if(PROC.state==='idle'){setTimeout(loadProc,0);return head+'<div class="card item muted">Chargement des fiches…</div>';}
+ if(PROC.state==='loading')return head+'<div class="card item muted">Chargement des fiches…</div>';
+ if(PROC.state==='error')return head+'<div class="alert crit"><div class="grow small">Impossible de lire les fiches pour le moment.</div><button class="btn" data-act="procreload">Réessayer</button></div>';
+ var cats=PCATS.filter(function(c){return PROC.items.some(function(f){return f.cat===c;});});
+ return head+(PROC.preview?'<div class="demo">Adresse de test : les fiches « À valider » sont visibles et marquées « En relecture ». Le staff ne voit que les fiches publiées.</div>':'')+
+ '<label class="sr" for="psearch">Rechercher une fiche</label><input id="psearch" class="search" type="search" placeholder="Rechercher : recouche, mojito, jacuzzi…" value="'+esc(PROC.q)+'" data-psearch="1" autocomplete="off">'+
+ '<div class="cats noprint"><button class="chip'+(PROC.cat?'':' sel')+'" data-pcat="">Toutes</button>'+cats.map(function(c){return '<button class="chip'+(PROC.cat===c?' sel':'')+'" data-pcat="'+esc(c)+'">'+esc(c)+'</button>';}).join('')+'</div>'+
+ '<div id="proclist" class="stack" style="gap:18px">'+procList()+'</div>';
+};
+V.proc=function(){
+ var f=procById(S.param);
+ var to=PROC.back||'procedures';var lab=to==='procedures'?'Procédures':'Retour';
+ if(!f){if(PROC.state==='idle')setTimeout(loadProc,0);return back(lab,to)+'<div class="card item muted">'+(PROC.state==='ok'?'Cette fiche n\'est pas (encore) publiée.':'Chargement de la fiche…')+'</div>';}
+ var meta=[f.type,f.postes.join(' · '),f.maj?'Mise à jour le '+frDate(f.maj):''].filter(Boolean);
+ return back(lab,to)+
+ '<div class="stack" style="gap:8px"><div class="label">'+esc(f.cat)+'</div><h1 class="display">'+esc(f.titre)+'</h1><div class="small muted">'+esc(meta.join(' · '))+'</div>'+(f.relecture?'<span class="pill p-warn" style="align-self:flex-start">En relecture · pas encore visible du staff</span>':'')+'</div>'+
+ md(f.contenu||f.resume||'')+
+ (f.photos.length?'<div class="pr-photos">'+f.photos.map(function(p){return '<img src="'+esc(p.thumb||p.url)+'" alt="'+esc(p.name||'')+'" loading="lazy">';}).join('')+'</div>':'')+
+ (f.docs.length?'<div class="stack"><h2 class="sec">Documents</h2><div class="card list">'+f.docs.map(function(d){return '<a class="item" style="color:var(--fg);text-decoration:none" href="'+esc(d.url)+'" target="_blank" rel="noopener"><span class="grow small">'+esc(d.name)+'</span><span class="muted">›</span></a>';}).join('')+'</div></div>':'')+
+ '<button class="btn primary block noprint" data-act="procprint" data-p="'+esc(f.id)+'">Imprimer la fiche</button>';
+};
+// raccourcis « Fiches utiles » sur les écrans de travail (colonne « Écrans de l'appli » dans Airtable)
+function procChips(v){
+ var e=ECRANS[v];if(!e||!S.role)return '';
+ if(PROC.state==='idle')setTimeout(loadProc,0);
+ if(PROC.state!=='ok')return '';
+ var fs=PROC.items.filter(function(f){return f.ecrans.indexOf(e)>=0;});
+ if(!fs.length)return '';
+ return '<div class="stack noprint"><div class="between"><h2 class="sec">Fiches utiles</h2><button class="back" style="min-height:0;font-size:13px" data-go="procedures">Toutes les fiches ›</button></div><div class="chips">'+fs.map(function(f){return '<button class="chip" data-go="proc" data-p="'+esc(f.id)+'" data-from="'+v+'">'+esc(f.titre)+(f.relecture?' ·&nbsp;relecture':'')+'</button>';}).join('')+'</div></div>';
+}
+function printProc(id){
+ var f=procById(id);if(!f)return;
+ var pz=document.getElementById('printzone');
+ pz.innerHTML='<div class="pz"><div class="pz-top"><img src="/logo.png" alt=""><div class="pz-brand"><div class="pz-name">Riad Anyssates</div><div class="pz-sub">Marrakech · Procédures internes</div></div><div class="pz-kind"><b>'+esc(f.type)+'</b>'+esc(f.cat)+'</div></div>'+
+  '<h1>'+esc(f.titre)+'</h1><div class="pz-meta"><div>Pour<span>'+esc(f.postes.join(' · ')||'Toute l\'équipe')+'</span></div><div>Mise à jour<span>'+esc(frDate(f.maj)||'—')+'</span></div><div>Réf.<span>'+esc(f.id)+'</span></div></div>'+
+  md(f.contenu||f.resume||'')+(f.photos.length?'<div class="pr-photos" style="margin-top:12px">'+f.photos.map(function(p){return '<img src="'+esc(p.thumb||p.url)+'" alt="">';}).join('')+'</div>':'')+
+  '<div class="pz-foot"><span>Riad Anyssates — Usage interne</span><span>Réf. '+esc(f.id)+' · Mis à jour le '+esc(frDate(f.maj)||'—')+'</span></div></div>';
+ document.body.classList.add('printing');
+ var done=function(){document.body.classList.remove('printing');window.removeEventListener('afterprint',done);};
+ window.addEventListener('afterprint',done);
+ var img=pz.querySelector('img');
+ var go2=function(){setTimeout(function(){window.print();},50);};
+ if(img&&!img.complete){img.onload=go2;img.onerror=go2;}else go2();
+}
+
 function stateLine(b){return b.state==='ok'?'<span class="pill p-ok" style="align-self:flex-start">Validé</span>':'<span class="pill p-warn" style="align-self:flex-start">Question envoyée à Tarik</span>';}
 
 /* ---------- render & events ---------- */
@@ -710,14 +870,16 @@ var app=document.getElementById('app');
 function render(){
  var v=!S.role?'roles':S.view;
  if(S.role&&!ACCESS[S.role]){S.role=null;v='roles';}
- if(v!=='roles'&&v!=='home'&&v!=='fiche'&&!can(v)){v='home';S.view='home';}
+ if(v!=='roles'&&v!=='home'&&v!=='fiche'&&v!=='proc'&&!can(v)){v='home';S.view='home';}
  if(S.role==='femme'&&v==='home'){v='mestaches';}
  if(v==='bdform'&&!S.draft){v='petitdej';S.view='petitdej';}
  if(S.role&&OCT.state==='idle')setTimeout(loadOct,0);
- app.innerHTML='<div class="view" style="display:flex;flex-direction:column;gap:18px">'+V[v]()+octBanner(v)+'</div>';
+ app.innerHTML='<div class="view" style="display:flex;flex-direction:column;gap:18px">'+V[v]()+octBanner(v)+procChips(v)+'</div>';
 }
 app.addEventListener('click',function(e){
- var el=e.target.closest('[data-role],[data-go],[data-act],[data-bdset],[data-bdint],[data-tab],[data-day],[data-step],[data-sig],[data-done],[data-spa],[data-buy],[data-nuit],[data-mfilter],[data-mday],[data-dfilter]');if(!el)return;
+ var el=e.target.closest('[data-role],[data-go],[data-act],[data-bdset],[data-bdint],[data-tab],[data-day],[data-step],[data-sig],[data-done],[data-spa],[data-buy],[data-nuit],[data-mfilter],[data-mday],[data-dfilter],[data-pcat]');if(!el)return;
+ if(el.dataset.pcat!==undefined){PROC.cat=el.dataset.pcat||null;render();return;}
+ if(el.dataset.go==='proc')PROC.back=el.dataset.from||(S.view==='proc'?PROC.back:'procedures');
  if(el.dataset.dfilter){var dv=el.dataset.dfilter;S.dfilter=S.dfilter===dv?null:dv;render();return;}
  if(el.dataset.mday){S.mday=+el.dataset.mday;S.mfilter=null;render();return;}
  if(el.dataset.mfilter){var mv=el.dataset.mfilter;S.mfilter=(mv==='tout'||S.mfilter===mv)?null:mv;render();return;}
@@ -730,6 +892,8 @@ app.addEventListener('click',function(e){
  if(a==='spareload'){loadSpa();return;}
  if(a==='octreload'){loadOct();return;}
  if(a==='print'){window.print();return;}
+ if(a==='procprint'){printProc(el.dataset.p);return;}
+ if(a==='procreload'){loadProc();return;}
  if(a==='nuitdone'){S.nuitDone=now();toast('Nuit clôturée, la direction est prévenue');render();return;}
  if(a==='nuitctl'){S.nuitCtl=now();toast('Contrôle enregistré');render();return;}
  if(a==='bdnew'||a==='bdedit'){var rid=el.dataset.p||(sansFiche()[0]||S.rooms.filter(function(x){return x.status!=='libre';})[0]).id;S.draft=mkDraft(rid);go('bdform');return;}
@@ -771,7 +935,7 @@ app.addEventListener('change',function(e){
  }
 });
 app.addEventListener('submit',function(e){if(e.target.dataset.teamform){e.preventDefault();var n=(document.getElementById('tm-n').value||'').trim();if(!n){toast('Indiquez le prénom');return;}var po=document.getElementById('tm-p').value;var rr=document.getElementById('tm-r').value;var men=/chambre|Gouvernante|nuit/.test(po);TEAM.push({n:n,p:po,menage:men,femme:/chambre/.test(po)});if(men)STAFF.push(n);if(/chambre/.test(po))FEMMES.push(n);if(rr)S.rest[n]=+rr;S.plan=null;toast(n+' ajouté(e) à l\'équipe');render();return;}if(e.target.dataset.pinform){e.preventDefault();var v=(document.getElementById('pin')||{}).value||'';if(!v.trim())return;LIVE.pin=v.trim();try{localStorage.setItem('anyssates-pin',LIVE.pin);}catch(x){}LIVE.error='';if(OCT.state==='pin')loadOct();if(can('spa'))loadSpa();}});
-app.addEventListener('input',function(e){if(e.target.dataset.comment)S.comment=e.target.value;if(e.target.dataset.bdf&&S.draft&&e.target.type!=='checkbox')S.draft[e.target.dataset.bdf]=e.target.value;});
+app.addEventListener('input',function(e){if(e.target.dataset.psearch){PROC.q=e.target.value;var pl=document.getElementById('proclist');if(pl)pl.innerHTML=procList();return;}if(e.target.dataset.comment)S.comment=e.target.value;if(e.target.dataset.bdf&&S.draft&&e.target.type!=='checkbox')S.draft[e.target.dataset.bdf]=e.target.value;});
 render();
 })();
 </script>
